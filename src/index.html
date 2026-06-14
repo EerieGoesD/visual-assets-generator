@@ -23,7 +23,7 @@
     --muted: #6b6b88;
     --success: #3de68e;
     --mono: 'JetBrains Mono', monospace;
-    --sans: 'Syne', sans-serif;
+    --sans: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -32,8 +32,10 @@
     background: var(--bg);
     color: var(--text);
     font-family: var(--sans);
-    min-height: 100vh;
-    overflow-x: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 
   /* Noise texture overlay */
@@ -48,8 +50,8 @@
   }
 
   header {
-    position: sticky;
-    top: 0;
+    flex: 0 0 auto;
+    position: relative;
     z-index: 10;
     padding: 14px 24px;
     border-bottom: 1px solid var(--border);
@@ -58,8 +60,6 @@
   }
 
   .header-inner {
-    max-width: 860px;
-    margin: 0 auto;
     display: flex;
     align-items: center;
     gap: 13px;
@@ -88,9 +88,58 @@
   }
 
   main {
-    max-width: 860px;
-    margin: 0 auto;
-    padding: 16px 24px 24px;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    padding: 16px 22px;
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    grid-template-rows: 1fr;
+    align-items: stretch;
+    gap: 18px;
+    overflow: hidden;
+  }
+
+  /* Two-pane app layout */
+  .pane {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .block { display: flex; flex-direction: column; min-height: 0; }
+  .block-grow { flex: 1 1 0; min-height: 0; }
+
+  .block-title {
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .app-footer {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+    gap: 12px;
+    white-space: nowrap;
+    padding: 9px 16px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    color: var(--muted);
     position: relative;
     z-index: 1;
   }
@@ -225,9 +274,12 @@
   /* Platform grid */
   .platforms-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 8px;
+    flex: 0 0 auto;
   }
+
+  .platform-count { display: none; }
 
   .platform-card {
     background: var(--surface);
@@ -286,10 +338,7 @@
   }
 
   .platform-count {
-    padding: 0 11px 9px;
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--muted);
+    display: none;
   }
 
   /* Asset panel */
@@ -302,7 +351,13 @@
     overflow: hidden;
   }
 
-  .asset-panel.visible { display: block; }
+  .asset-panel.visible {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+  }
 
   .asset-panel-header {
     display: flex;
@@ -502,15 +557,17 @@
 
   /* Log */
   #logPanel {
-    display: none;
-    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    min-height: 0;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 10px;
     overflow: hidden;
   }
 
-  #logPanel.visible { display: block; }
+  #logPanel.visible { display: flex; }
 
   .log-header {
     padding: 10px 16px;
@@ -529,7 +586,8 @@
     font-size: 11px;
     line-height: 1.8;
     color: var(--muted);
-    max-height: 220px;
+    flex: 1 1 0;
+    min-height: 0;
     overflow-y: auto;
   }
 
@@ -547,18 +605,21 @@
 
   /* Selection summary */
   .summary-bar {
+    flex: 0 0 auto;
+    height: 74px;
     background: var(--surface2);
     border: 1px solid var(--border);
     border-radius: 8px;
     padding: 9px 14px;
     font-family: var(--mono);
     font-size: 12px;
+    line-height: 1.5;
     color: var(--muted);
     margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
   }
 
   .summary-bar .count {
@@ -625,108 +686,101 @@
 
 <main>
 
-  <!-- STEP 1: Image -->
-  <div class="step">
-    <div class="step-label">
-      <div class="step-num">01</div>
-      <div class="step-title">Source Image</div>
-    </div>
+  <!-- LEFT: source image + platforms -->
+  <section class="pane pane-left">
 
-    <div id="dropzone">
-      <span class="dropzone-icon">🖼️</span>
-      <p class="dropzone-text">
-        <span>Drag &amp; drop an image, or <strong onclick="document.getElementById('fileInput').click()">browse</strong></span>
-        <span class="dz-hint">PNG / JPG · 1024×1024+ recommended</span>
-      </p>
-      <input type="file" id="fileInput" accept=".png,.jpg,.jpeg" />
+    <div class="block">
+      <div class="block-title">Source Image</div>
+      <div id="dropzone">
+        <span class="dropzone-icon">🖼️</span>
+        <p class="dropzone-text">
+          <span>Drag &amp; drop an image, or <strong onclick="document.getElementById('fileInput').click()">browse</strong></span>
+          <span class="dz-hint">PNG / JPG · 1024×1024+ recommended</span>
+        </p>
+        <input type="file" id="fileInput" accept=".png,.jpg,.jpeg" />
 
-      <div id="imagePreview">
-        <img id="previewImg" src="" alt="preview" />
-        <div class="preview-info">
-          <div class="preview-name" id="previewName">—</div>
-          <div class="preview-dims" id="previewDims">—</div>
-          <button class="btn-change" onclick="document.getElementById('fileInput').click()">Change image</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- STEP 2: Platforms -->
-  <div class="step">
-    <div class="step-label">
-      <div class="step-num">02</div>
-      <div class="step-title">Target Platforms</div>
-    </div>
-
-    <div class="platforms-grid" id="platformsGrid"></div>
-
-    <div class="asset-panel" id="assetPanel"></div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- STEP 3: Options & Generate -->
-  <div class="step">
-    <div class="step-label">
-      <div class="step-num">03</div>
-      <div class="step-title">Options &amp; Export</div>
-    </div>
-
-    <div class="options-row" style="margin-bottom:10px;">
-      <div class="toggle-option on" id="toggleContain" onclick="toggleOption('toggleContain','contain')">
-        <div class="toggle-box">✓</div>
-        <div class="toggle-label">Letterbox (contain)</div>
-      </div>
-      <div class="toggle-option" id="toggleCover" onclick="toggleOption('toggleCover','cover')">
-        <div class="toggle-box"></div>
-        <div class="toggle-label">Crop (cover)</div>
-      </div>
-    </div>
-
-    <div class="options-row" style="margin-bottom:10px;">
-      <div class="toggle-option" id="toggleFlutter" onclick="toggleFlutter()">
-        <div class="toggle-box"></div>
-        <div class="toggle-label">Flutter naming convention</div>
-      </div>
-      <div class="toggle-option" id="toggleAndroidSafePadding" onclick="toggleAndroidSafePadding()">
-        <div class="toggle-box"></div>
-        <div>
-          <div class="toggle-label">Add padding to Android app icons</div>
-          <div class="option-help">Creates adaptive icon foreground/background files to prevent Pixel and Android launcher cropping.</div>
+        <div id="imagePreview">
+          <img id="previewImg" src="" alt="preview" />
+          <div class="preview-info">
+            <div class="preview-name" id="previewName">-</div>
+            <div class="preview-dims" id="previewDims">-</div>
+            <button class="btn-change" onclick="document.getElementById('fileInput').click()">Change image</button>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="summary-bar" id="summaryBar">
-      Select platforms and assets above to see a summary.
+    <div class="block block-grow">
+      <div class="block-title">Platforms</div>
+      <div class="platforms-grid" id="platformsGrid"></div>
+      <div class="asset-panel" id="assetPanel"></div>
     </div>
 
-    <button id="generateBtn" onclick="generate()" disabled>
-      Generate &amp; Save ZIP
-      <div class="btn-spinner"></div>
-    </button>
+  </section>
 
-<div style="display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;gap:12px;margin-top:18px;font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;font-size:13.5px;font-weight:500;letter-spacing:0.2px;color:var(--muted);white-space:nowrap;">
-      <span>Made by <a href="#" onclick="openExternal(event,'https://eeriegoesd.com')" style="color:var(--accent);text-decoration:none;font-weight:700;">EERIE</a></span>
-      <span style="color:var(--border)">|</span>
-      <a href="#" onclick="openExternal(event,'https://buymeacoffee.com/eeriegoesd')" style="color:#ffd60a;text-decoration:none;font-weight:700;">Support This Project</a>
-      <span style="color:var(--border)">|</span>
-      <a href="#" onclick="openExternal(event,'https://github.com/EerieGoesD/visual-assets-generator/discussions')" style="color:var(--muted);text-decoration:none;font-weight:600;">Feedback</a>
-      <span style="color:var(--border)">|</span>
-      <a href="#" onclick="openExternal(event,'https://github.com/EerieGoesD/visual-assets-generator/issues/new?template=bug-report.md')" style="color:var(--muted);text-decoration:none;font-weight:600;">Report Issue</a>
-      <span style="color:var(--border)">|</span>
-      <a href="#" onclick="openExternal(event,'https://github.com/EerieGoesD/visual-assets-generator/issues/new?template=feature-request.md')" style="color:var(--muted);text-decoration:none;font-weight:600;">Suggest Feature</a>
+  <!-- RIGHT: options + output log -->
+  <section class="pane pane-right">
+
+    <div class="block">
+      <div class="block-title">Options</div>
+
+      <div class="options-row" style="margin-bottom:10px;">
+        <div class="toggle-option on" id="toggleContain" onclick="toggleOption('toggleContain','contain')">
+          <div class="toggle-box">✓</div>
+          <div class="toggle-label">Letterbox (contain)</div>
+        </div>
+        <div class="toggle-option" id="toggleCover" onclick="toggleOption('toggleCover','cover')">
+          <div class="toggle-box"></div>
+          <div class="toggle-label">Crop (cover)</div>
+        </div>
+      </div>
+
+      <div class="options-row" style="margin-bottom:10px;">
+        <div class="toggle-option" id="toggleFlutter" onclick="toggleFlutter()">
+          <div class="toggle-box"></div>
+          <div class="toggle-label">Flutter naming convention</div>
+        </div>
+        <div class="toggle-option" id="toggleAndroidSafePadding" onclick="toggleAndroidSafePadding()">
+          <div class="toggle-box"></div>
+          <div>
+            <div class="toggle-label">Add padding to Android app icons</div>
+            <div class="option-help">Creates adaptive icon foreground/background files to prevent Pixel and Android launcher cropping.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="summary-bar" id="summaryBar">
+        Select platforms and assets to see a summary.
+      </div>
+
+      <button id="generateBtn" onclick="generate()" disabled>
+        Generate &amp; Save ZIP
+        <div class="btn-spinner"></div>
+      </button>
     </div>
 
-
-    <div id="logPanel">
-      <div class="log-header">// Output Log</div>
-      <div id="logOutput"></div>
+    <div class="block block-grow">
+      <div class="block-title">Output Log</div>
+      <div id="logPanel">
+        <div id="logOutput"></div>
+      </div>
     </div>
+
+  </section>
 
 </main>
+
+<footer class="app-footer">
+  <span>Made by <a href="#" onclick="openExternal(event,'https://eeriegoesd.com')" style="color:var(--accent);text-decoration:none;font-weight:700;">EERIE</a></span>
+  <span style="color:var(--border)">|</span>
+  <a href="#" onclick="openExternal(event,'https://buymeacoffee.com/eeriegoesd')" style="color:#ffd60a;text-decoration:none;font-weight:700;">Support This Project</a>
+  <span style="color:var(--border)">|</span>
+  <a href="#" onclick="openExternal(event,'https://github.com/EerieGoesD/visual-assets-generator/discussions')" style="color:var(--muted);text-decoration:none;font-weight:600;">Feedback</a>
+  <span style="color:var(--border)">|</span>
+  <a href="#" onclick="openExternal(event,'https://github.com/EerieGoesD/visual-assets-generator/issues/new?template=bug-report.md')" style="color:var(--muted);text-decoration:none;font-weight:600;">Report Issue</a>
+  <span style="color:var(--border)">|</span>
+  <a href="#" onclick="openExternal(event,'https://github.com/EerieGoesD/visual-assets-generator/issues/new?template=feature-request.md')" style="color:var(--muted);text-decoration:none;font-weight:600;">Suggest Feature</a>
+</footer>
 
 <script>
 // ─────────────────────────────────────────────
