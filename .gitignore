@@ -15,3 +15,6 @@
 # OS cruft
 .DS_Store
 Thumbs.db
+
+# Development certificate
+devcert.pfx
