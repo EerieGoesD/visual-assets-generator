@@ -13,6 +13,9 @@ A clear and concise description of what the problem is. Ex. I'm always frustrate
 **Describe the solution you'd like**
 A clear and concise description of what you want to happen.
 
+**Which platform or asset does this relate to?**
+e.g. Microsoft Store, Windows .ico, macOS, Android, iOS, Chrome Extension, Favicon, Social/OG, Flatpak - or general.
+
 **Describe alternatives you've considered**
 A clear and concise description of any alternative solutions or features you've considered.
 
