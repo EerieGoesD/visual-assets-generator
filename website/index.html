@@ -1,0 +1,2236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<!-- Primary SEO -->
+<title>Visual Assets Generator — App Icons for Windows, macOS, Android, iOS & Chrome</title>
+<meta name="description" content="Free browser-based tool to generate all platform app icons and visual assets from a single image. Supports Microsoft Store, Windows .ico, macOS, Android Play Store, iOS App Store, Chrome Extension, and Flutter naming. No install, no signup." />
+<meta name="keywords" content="app icon generator, visual assets generator, windows store assets, windows ico, macos icons, android icons, ios app icons, chrome extension icons, microsoft store wack, badge logo generator, free icon resizer, flutter icons" />
+<meta name="author" content="EERIE" />
+<meta name="google-site-verification" content="013d1db42c419216" />
+<link rel="canonical" href="https://eeriegoesd.com/visual-assets-generator-website/" />
+<link rel="icon" type="image/png" href="favicon.png" />
+<link rel="apple-touch-icon" href="favicon.png" />
+
+<!-- Open Graph (Facebook, LinkedIn, Discord) -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://eeriegoesd.com/visual-assets-generator-website/" />
+<meta property="og:title" content="Visual Assets Generator — App Icons for Windows, macOS, Android, iOS & Chrome" />
+<meta property="og:description" content="Upload one image, download all your app icons and store assets as a ZIP. Supports Microsoft Store, Windows .ico, macOS, Android, iOS, Chrome Extension, and Flutter naming. Free, runs entirely in the browser." />
+<meta property="og:image" content="https://eeriegoesd.com/visual-assets-generator-website/og-preview.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:site_name" content="Visual Assets Generator" />
+
+<!-- Twitter / X Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:url" content="https://eeriegoesd.com/visual-assets-generator-website/" />
+<meta name="twitter:title" content="Visual Assets Generator — App Icons for Windows, macOS, Android, iOS & Chrome" />
+<meta name="twitter:description" content="Upload one image, download all your app icons and store assets as a ZIP. Free, runs entirely in the browser." />
+<meta name="twitter:image" content="https://eeriegoesd.com/visual-assets-generator-website/og-preview.png" />
+
+<!-- Structured Data (JSON-LD) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Visual Assets Generator",
+  "url": "https://eeriegoesd.com/visual-assets-generator-website/",
+  "description": "Free browser-based tool to generate all platform app icons and visual assets from a single image. Supports Microsoft Store, Windows .ico, macOS, Android Play Store, iOS App Store, Chrome Extension, and Flutter naming.",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "EERIE",
+    "url": "https://eeriegoesd.com"
+  },
+  "featureList": [
+    "Microsoft Store visual assets (WACK compliant)",
+    "Windows .ico desktop app icon",
+    "macOS app icons",
+    "Android Play Store icons",
+    "iOS App Store icons",
+    "Chrome Extension icons and promo tiles",
+    "Flutter naming convention support",
+    "ZIP download",
+    "No install or signup required",
+    "Favicon generation",
+    "Social / Open Graph image generation",
+    "Flatpak (Flathub) icons"  ]
+}
+</script>
+<!-- Google Analytics — loaded only after cookie consent -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('consent', 'default', { analytics_storage: 'denied' });
+  function initGtag() {
+    gtag('consent', 'update', { analytics_storage: 'granted' });
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=G-FZ24TLKL16';
+    document.head.appendChild(s);
+    gtag('js', new Date());
+    gtag('config', 'G-FZ24TLKL16');
+  }
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: #2a2a3a;
+    --accent: #ff6b2b;
+    --accent2: #ff9a5c;
+    --text: #e8e8f0;
+    --muted: #6b6b88;
+    --success: #3de68e;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Noise texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+  }
+
+  header {
+    position: relative;
+    padding: 48px 24px 36px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, #0f0f1a 0%, var(--bg) 100%);
+    overflow: hidden;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    top: -60px; left: -40px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(255,107,43,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .header-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    opacity: 0.9;
+  }
+
+  h1 {
+    font-size: clamp(28px, 5vw, 44px);
+    font-weight: 800;
+    line-height: 1.1;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    font-family: var(--mono);
+    line-height: 1.7;
+  }
+
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step {
+    margin-bottom: 40px;
+  }
+
+  .step-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .step-num {
+    width: 28px; height: 28px;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: 12px;
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+    flex-shrink: 0;
+  }
+
+  .step-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* Drop zone */
+  #dropzone {
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 48px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--surface);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #dropzone:hover, #dropzone.drag-over {
+    border-color: var(--accent);
+    background: rgba(255,107,43,0.04);
+  }
+
+  #dropzone.has-image {
+    border-style: solid;
+    border-color: var(--accent);
+    padding: 20px;
+  }
+
+  .dropzone-icon {
+    font-size: 36px;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .dropzone-text {
+    color: var(--muted);
+    font-size: 14px;
+    font-family: var(--mono);
+    line-height: 1.6;
+  }
+
+  .dropzone-text strong { color: var(--accent); cursor: pointer; }
+
+  #fileInput { display: none; }
+
+  #imagePreview {
+    display: none;
+    gap: 20px;
+    align-items: center;
+  }
+
+  #imagePreview img {
+    width: 80px; height: 80px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: repeating-conic-gradient(#1a1a24 0% 25%, #111118 0% 50%) 0 0/12px 12px;
+    flex-shrink: 0;
+  }
+
+  .preview-info {
+    text-align: left;
+  }
+
+  .preview-name {
+    color: #fff;
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+
+  .preview-dims {
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+
+  .btn-change {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    background: transparent;
+    border: 1px solid var(--accent);
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-change:hover { background: rgba(255,107,43,0.1); }
+
+  /* Platform grid */
+  .platforms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 14px;
+  }
+
+  .platform-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+
+  .platform-card:hover {
+    border-color: var(--muted);
+    transform: translateY(-1px);
+  }
+
+  .platform-card.selected {
+    border-color: var(--accent);
+    background: rgba(255,107,43,0.04);
+  }
+
+  .platform-header {
+    padding: 16px 16px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .platform-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .platform-name {
+    font-weight: 700;
+    font-size: 14px;
+    color: #fff;
+    flex: 1;
+  }
+
+  .platform-check {
+    width: 18px; height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    font-size: 11px;
+  }
+
+  .platform-card.selected .platform-check {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .platform-count {
+    padding: 0 16px 14px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* Asset panel */
+  .asset-panel {
+    display: none;
+    margin-top: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .asset-panel.visible { display: block; }
+
+  .asset-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .asset-panel-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .asset-panel-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-sm {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    background: transparent;
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-sm:hover { color: var(--text); border-color: var(--muted); }
+
+  .asset-section {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .asset-section:last-child { border-bottom: none; }
+
+  .asset-section-title {
+    padding: 10px 18px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    background: rgba(255,107,43,0.04);
+  }
+
+  .asset-list {
+    padding: 10px 18px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 4px;
+  }
+
+  .asset-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .asset-item:hover { background: rgba(255,255,255,0.03); }
+
+  .asset-cb {
+    width: 14px; height: 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+    font-size: 9px;
+  }
+
+  .asset-item.checked .asset-cb {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .asset-name {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text);
+    flex: 1;
+  }
+
+  .asset-size {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  /* Options */
+  .options-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .toggle-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+
+  .toggle-box {
+    width: 18px; height: 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    transition: all 0.15s;
+  }
+
+  .toggle-option.on .toggle-box {
+    background: var(--success);
+    border-color: var(--success);
+    color: #000;
+  }
+
+  .toggle-label {
+    font-size: 13px;
+    font-family: var(--mono);
+    color: var(--muted);
+  }
+
+  .toggle-option.on .toggle-label { color: var(--text); }
+
+  .option-help {
+    margin-top: 3px;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.35;
+    color: var(--muted);
+  }
+
+  /* Generate button */
+  #generateBtn {
+    width: 100%;
+    padding: 18px;
+    background: var(--accent);
+    color: #fff;
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: 16px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+
+  #generateBtn:hover:not(:disabled) {
+    background: var(--accent2);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 32px rgba(255,107,43,0.3);
+  }
+
+  #generateBtn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  #generateBtn .btn-spinner {
+    display: none;
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  #generateBtn.loading .btn-spinner { display: block; }
+
+  @keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
+
+  /* Log */
+  #logPanel {
+    display: none;
+    margin-top: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  #logPanel.visible { display: block; }
+
+  .log-header {
+    padding: 10px 16px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  #logOutput {
+    padding: 14px 16px;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.8;
+    color: var(--muted);
+    max-height: 220px;
+    overflow-y: auto;
+  }
+
+  #logOutput .log-ok { color: var(--success); }
+  #logOutput .log-skip { color: var(--muted); }
+  #logOutput .log-err { color: #ff5555; }
+  #logOutput .log-info { color: var(--accent2); }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 32px 0;
+  }
+
+  /* Selection summary */
+  .summary-bar {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .summary-bar .count {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ── Cookie banner ── */
+  .cookie-banner {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 9999;
+    background: var(--surface); border-top: 1px solid var(--border);
+    padding: 14px 24px; display: none; flex-wrap: wrap;
+    align-items: center; justify-content: center; gap: 16px;
+    font-family: var(--mono); font-size: 11px; color: var(--muted);
+  }
+  .cookie-banner button {
+    font-family: var(--mono); font-size: 11px; padding: 6px 16px;
+    border-radius: 5px; cursor: pointer; border: 1px solid var(--border);
+  }
+  .cookie-accept { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .cookie-accept:hover { background: var(--accent2); }
+  .cookie-reject { background: transparent; color: var(--muted); }
+  .cookie-reject:hover { border-color: var(--muted); color: var(--text); }
+
+  /* ── Privacy modal ── */
+  .privacy-overlay {
+    display: none; position: fixed; inset: 0; z-index: 400;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+    justify-content: center; align-items: flex-start; padding: 40px 20px; overflow-y: auto;
+  }
+  .privacy-overlay.open { display: flex; }
+  .privacy-modal {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+    max-width: 700px; width: 100%; max-height: calc(100vh - 80px); overflow-y: auto; padding: 28px;
+  }
+  .privacy-modal h2 { font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 16px; }
+  .privacy-modal h3 { font-size: 13px; font-weight: 700; color: var(--accent); margin: 20px 0 8px; }
+  .privacy-modal p, .privacy-modal li { font-family: var(--mono); font-size: 11px; color: var(--muted); line-height: 1.8; }
+  .privacy-modal ul { padding-left: 20px; margin: 8px 0; }
+  .privacy-modal .close-priv {
+    float: right; background: transparent; border: 1px solid var(--border); color: var(--muted);
+    width: 28px; height: 28px; border-radius: 4px; cursor: pointer; font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .privacy-modal .close-priv:hover { border-color: var(--danger, #ff5555); color: var(--danger, #ff5555); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <p class="tag">// Visual Assets Generator v2.0</p>
+    <h1>App Icon &amp;<br><span>Asset Exporter</span></h1>
+    <p class="subtitle">
+      Upload one source image → generate all platform assets → download ZIP.<br>
+      Supports Windows Store · macOS · Android · iOS · Chrome Extension.
+    <p style="margin-top:14px; font-family:var(--mono); font-size:11px; color:var(--muted);">
+      🖥️ 8 platforms · 🔒 Runs entirely in your browser · ☕ Free forever
+    </p>
+    </p>
+  </div>
+</header>
+
+<main>
+
+  <!-- STEP 1: Image -->
+  <div class="step">
+    <div class="step-label">
+      <div class="step-num">01</div>
+      <div class="step-title">Source Image</div>
+    </div>
+
+    <div id="dropzone">
+      <span class="dropzone-icon">🖼️</span>
+      <p class="dropzone-text">
+        Drag & drop your icon here<br>
+        or <strong onclick="document.getElementById('fileInput').click()">browse to upload</strong>
+      </p>
+      <p class="dropzone-text" style="margin-top:8px;font-size:11px;">PNG, JPG, JPEG • Recommended: 1024×1024 or larger</p>
+      <input type="file" id="fileInput" accept=".png,.jpg,.jpeg" />
+
+      <div id="imagePreview">
+        <img id="previewImg" src="" alt="preview" />
+        <div class="preview-info">
+          <div class="preview-name" id="previewName">—</div>
+          <div class="preview-dims" id="previewDims">—</div>
+          <button class="btn-change" onclick="document.getElementById('fileInput').click()">Change image</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- STEP 2: Platforms -->
+  <div class="step">
+    <div class="step-label">
+      <div class="step-num">02</div>
+      <div class="step-title">Target Platforms</div>
+    </div>
+
+    <div class="platforms-grid" id="platformsGrid"></div>
+
+    <div class="asset-panel" id="assetPanel"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- STEP 3: Options & Generate -->
+  <div class="step">
+    <div class="step-label">
+      <div class="step-num">03</div>
+      <div class="step-title">Options &amp; Export</div>
+    </div>
+
+    <div class="options-row" style="margin-bottom:24px;">
+      <div class="toggle-option on" id="toggleContain" onclick="toggleOption('toggleContain','contain')">
+        <div class="toggle-box">✓</div>
+        <div class="toggle-label">Letterbox (contain)</div>
+      </div>
+      <div class="toggle-option" id="toggleCover" onclick="toggleOption('toggleCover','cover')">
+        <div class="toggle-box"></div>
+        <div class="toggle-label">Crop (cover)</div>
+      </div>
+    </div>
+
+    <div class="options-row" style="margin-bottom:24px;">
+      <div class="toggle-option" id="toggleFlutter" onclick="toggleFlutter()">
+        <div class="toggle-box"></div>
+        <div class="toggle-label">Flutter naming convention</div>
+      </div>
+      <div class="toggle-option" id="toggleAndroidSafePadding" onclick="toggleAndroidSafePadding()">
+        <div class="toggle-box"></div>
+        <div>
+          <div class="toggle-label">Add padding to Android app icons</div>
+          <div class="option-help">Creates adaptive icon foreground/background files to prevent Pixel and Android launcher cropping.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-bar" id="summaryBar">
+      Select platforms and assets above to see a summary.
+    </div>
+
+    <button id="generateBtn" onclick="generate()" disabled>
+      Generate &amp; Download ZIP
+      <div class="btn-spinner"></div>
+    </button>
+
+<div style="display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:16px;font-family:var(--mono);font-size:11px;color:var(--muted);">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span>Made by</span>
+      <a href="https://eeriegoesd.com" target="_blank" rel="noreferrer" style="color:var(--accent);text-decoration:none;font-weight:700;">EERIE</a>
+      <span style="color:var(--border)">|</span>
+      <a href="https://buymeacoffee.com/eeriegoesd" target="_blank" rel="noreferrer" style="color:var(--accent);text-decoration:none;">Buy Me a Coffee</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <a href="#" onclick="event.preventDefault();openPrivacy('privacy')" style="color:var(--muted);text-decoration:none;">Privacy Policy</a>
+      <span style="color:var(--border)">|</span>
+      <a href="#" onclick="event.preventDefault();openPrivacy('cookies')" style="color:var(--muted);text-decoration:none;">Cookie Policy</a>
+      <span style="color:var(--border)">|</span>
+      <a href="https://github.com/EerieGoesD/visual-assets-generator-website/discussions" target="_blank" rel="noreferrer" style="color:var(--muted);text-decoration:none;">Feedback</a>
+      <span style="color:var(--border)">|</span>
+      <a href="https://github.com/EerieGoesD/visual-assets-generator-website/issues" target="_blank" rel="noreferrer" style="color:var(--muted);text-decoration:none;">Report bug</a>
+    </div>
+    </div>
+
+<div class="divider"></div>
+    <h2 style="font-size:18px; font-weight:800; color:#fff; margin:32px 0 20px;">Frequently Asked Questions</h2>
+
+    <details style="margin-bottom:12px; border:1px solid var(--border); border-radius:8px; background:var(--surface);">
+      <summary style="padding:14px 18px; cursor:pointer; font-weight:700; font-size:13px; color:var(--text);">What platforms are supported?</summary>
+      <p style="padding:0 18px 14px; font-size:13px; color:var(--muted); line-height:1.7; font-family:var(--mono);">Microsoft Store (WACK-compliant), Windows desktop .ico, macOS, Android Play Store, iOS App Store, Chrome Extension, Favicon, Social/OG images, and Flatpak. Each platform includes all required icon sizes and store listing graphics.</p>
+    </details>
+
+    <details style="margin-bottom:12px; border:1px solid var(--border); border-radius:8px; background:var(--surface);">
+      <summary style="padding:14px 18px; cursor:pointer; font-weight:700; font-size:13px; color:var(--text);">Is my image uploaded to a server?</summary>
+      <p style="padding:0 18px 14px; font-size:13px; color:var(--muted); line-height:1.7; font-family:var(--mono);">No. All image processing happens locally in your browser using the Canvas API. Your image never leaves your device — nothing is uploaded anywhere.</p>
+    </details>
+
+    <details style="margin-bottom:12px; border:1px solid var(--border); border-radius:8px; background:var(--surface);">
+      <summary style="padding:14px 18px; cursor:pointer; font-weight:700; font-size:13px; color:var(--text);">What image size should I use?</summary>
+      <p style="padding:0 18px 14px; font-size:13px; color:var(--muted); line-height:1.7; font-family:var(--mono);">At least 1024×1024 pixels for best results, since some assets (like iOS App Store icons) require that resolution. Larger images will be scaled down without quality loss. PNG is preferred for transparency support.</p>
+    </details>
+
+    <details style="margin-bottom:12px; border:1px solid var(--border); border-radius:8px; background:var(--surface);">
+      <summary style="padding:14px 18px; cursor:pointer; font-weight:700; font-size:13px; color:var(--text);">What's the difference between Letterbox and Crop?</summary>
+      <p style="padding:0 18px 14px; font-size:13px; color:var(--muted); line-height:1.7; font-family:var(--mono);">Letterbox (contain) fits your entire image inside the target dimensions, adding transparent padding if the aspect ratio doesn't match. Crop (cover) fills the entire target area, cutting off edges if needed. For square icons, both produce the same result.</p>
+    </details>
+
+    <details style="margin-bottom:12px; border:1px solid var(--border); border-radius:8px; background:var(--surface);">
+      <summary style="padding:14px 18px; cursor:pointer; font-weight:700; font-size:13px; color:var(--text);">How do Windows Store badge logos work?</summary>
+      <p style="padding:0 18px 14px; font-size:13px; color:var(--muted); line-height:1.7; font-family:var(--mono);">Badge logos must pass Microsoft's WACK validation: all visible pixels must be pure white on a transparent background. This tool automatically detects and removes the background using dominant color detection and Otsu thresholding, then converts the foreground to white.</p>
+    </details>
+
+    <details style="margin-bottom:12px; border:1px solid var(--border); border-radius:8px; background:var(--surface);">
+      <summary style="padding:14px 18px; cursor:pointer; font-weight:700; font-size:13px; color:var(--text);">What is the "Flutter naming convention" option?</summary>
+      <p style="padding:0 18px 14px; font-size:13px; color:var(--muted); line-height:1.7; font-family:var(--mono);">When enabled, iOS and macOS icons are exported with the filenames that Flutter expects (e.g. Icon-App-60x60@2x.png instead of iPhone-120.png). This lets you drop the generated files directly into your Flutter project's asset directories without renaming.</p>
+    </details>
+
+    <details style="margin-bottom:12px; border:1px solid var(--border); border-radius:8px; background:var(--surface);">
+      <summary style="padding:14px 18px; cursor:pointer; font-weight:700; font-size:13px; color:var(--text);">What about macOS and Windows .ico?</summary>
+      <p style="padding:0 18px 14px; font-size:13px; color:var(--muted); line-height:1.7; font-family:var(--mono);">The macOS platform generates all 7 standard app icon sizes (16px to 1024px). The Windows platform includes a Desktop App Icon (.ico) section that generates a multi-resolution .ico file containing 16, 32, 48, 64, 128, and 256px sizes — ready for use as a Windows desktop app icon (e.g. Flutter's Windows runner).</p>
+    </details>
+
+    <div id="logPanel">
+      <div class="log-header">// Output Log</div>
+      <div id="logOutput"></div>
+    </div>
+
+</main>
+
+<script>
+// ─────────────────────────────────────────────
+// PLATFORM & ASSET DEFINITIONS
+// ─────────────────────────────────────────────
+
+const PLATFORMS = [
+  {
+    id: 'windows',
+    name: 'Microsoft Store',
+    icon: '🪟',
+    sections: [
+      {
+        title: 'Badge Logo',
+        assets: [
+          { file: 'Assets/BadgeLogo.png',         w: 24,   h: 24,   badge: true },
+          { file: 'Assets/BadgeLogo.scale-200.png', w: 48,  h: 48,   badge: true },
+          { file: 'Assets/BadgeLogo.scale-400.png', w: 96,  h: 96,   badge: true },
+        ]
+      },
+      {
+        title: 'Large Tile',
+        assets: [
+          { file: 'Assets/LargeTile.png',           w: 310,  h: 310 },
+          { file: 'Assets/LargeTile.scale-200.png', w: 620,  h: 620 },
+          { file: 'Assets/LargeTile.scale-400.png', w: 1240, h: 1240 },
+        ]
+      },
+      {
+        title: 'Small Tile',
+        assets: [
+          { file: 'Assets/SmallTile.png',           w: 71,  h: 71 },
+          { file: 'Assets/SmallTile.scale-200.png', w: 142, h: 142 },
+          { file: 'Assets/SmallTile.scale-400.png', w: 284, h: 284 },
+        ]
+      },
+      {
+        title: 'Splash Screen',
+        assets: [
+          { file: 'Assets/SplashScreen.png',           w: 620,  h: 300 },
+          { file: 'Assets/SplashScreen.scale-200.png', w: 1240, h: 600 },
+          { file: 'Assets/SplashScreen.scale-400.png', w: 2480, h: 1200 },
+        ]
+      },
+      {
+        title: 'Square 150×150 Logo',
+        assets: [
+          { file: 'Assets/Square150x150Logo.png',           w: 150, h: 150 },
+          { file: 'Assets/Square150x150Logo.scale-200.png', w: 300, h: 300 },
+          { file: 'Assets/Square150x150Logo.scale-400.png', w: 600, h: 600 },
+        ]
+      },
+      {
+        title: 'Square 44×44 Logo',
+        assets: [
+          { file: 'Assets/Square44x44Logo.targetsize-16.png',  w: 16, h: 16 },
+          { file: 'Assets/Square44x44Logo.altform-lightunplated_targetsize-16.png',  w: 16,  h: 16 },
+          { file: 'Assets/Square44x44Logo.altform-unplated_targetsize-16.png',  w: 16,  h: 16 },
+          { file: 'Assets/Square44x44Logo.png',           w: 44, h: 44 },
+          { file: 'Assets/Square44x44Logo.targetsize-48.png',  w: 48, h: 48 },
+          { file: 'Assets/Square44x44Logo.altform-lightunplated_targetsize-48.png',  w: 48,  h: 48 },
+          { file: 'Assets/Square44x44Logo.altform-unplated_targetsize-48.png',  w: 48,  h: 48 },
+          { file: 'Assets/Square44x44Logo.scale-200.png', w: 88, h: 88 },
+          { file: 'Assets/Square44x44Logo.scale-400.png', w: 176, h: 176 },
+          { file: 'Assets/Square44x44Logo.targetsize-256.png', w: 256, h: 256 },
+          { file: 'Assets/Square44x44Logo.altform-lightunplated_targetsize-256.png', w: 256, h: 256 },
+          { file: 'Assets/Square44x44Logo.altform-unplated_targetsize-256.png', w: 256, h: 256 },
+        ]
+      },
+      {
+        title: 'Store Logo',
+        assets: [
+          { file: 'Assets/StoreLogo.png',           w: 50,  h: 50 },
+          { file: 'Assets/StoreLogo.scale-200.png', w: 100, h: 100 },
+          { file: 'Assets/StoreLogo.scale-400.png', w: 200, h: 200 },
+        ]
+      },
+      {
+        title: 'Wide 310×150 Logo',
+        assets: [
+          { file: 'Assets/Wide310x150Logo.png',           w: 310,  h: 150 },
+          { file: 'Assets/Wide310x150Logo.scale-200.png', w: 620,  h: 300 },
+          { file: 'Assets/Wide310x150Logo.scale-400.png', w: 1240, h: 600 },
+        ]
+      },
+      {
+        title: 'Screenshots (Store Listing)',
+        assets: [
+          { file: 'Screenshots/App Tile Small.png',      w: 71,   h: 71 },
+          { file: 'Screenshots/App Tile Square.png',     w: 150,  h: 150 },
+          { file: 'Screenshots/App Tile 1x1.png',        w: 300,  h: 300 },
+          { file: 'Screenshots/Poster 9x16.png',         w: 720,  h: 1080 },
+          { file: 'Screenshots/Box 1x1.png',             w: 1080, h: 1080 },
+          { file: 'Screenshots/Poster 9x16 @2x.png',     w: 1440, h: 2160 },
+          { file: 'Screenshots/Highlight 16x9.png',      w: 1920, h: 1080 },
+          { file: 'Screenshots/Box 1x1 @2x.png',         w: 2160, h: 2160 },
+        ]
+      },
+      {
+        title: 'Desktop App Icon (.ico)',
+        assets: [
+          { file: 'Windows/app_icon.ico', w: 256, h: 256, ico: true },
+        ]
+      },
+    ]
+  },
+  {
+    id: 'android',
+    name: 'Android (Play Store)',
+    icon: '🤖',
+    sections: [
+      {
+        title: 'App Icon',
+        assets: [
+          { file: 'Android/mipmap-mdpi/ic_launcher.png',     w: 48,  h: 48 },
+          { file: 'Android/mipmap-hdpi/ic_launcher.png',     w: 72,  h: 72 },
+          { file: 'Android/mipmap-xhdpi/ic_launcher.png',    w: 96,  h: 96 },
+          { file: 'Android/mipmap-xxhdpi/ic_launcher.png',   w: 144, h: 144 },
+          { file: 'Android/app-icon-192.png',                w: 192, h: 192 },
+          { file: 'Android/mipmap-xxxhdpi/ic_launcher.png',  w: 192, h: 192 },
+          { file: 'Android/app-icon-512.png',                w: 512, h: 512 },
+        ]
+      },
+      {
+        title: 'Play Store Graphics',
+        assets: [
+          { file: 'Android/play-store-feature-graphic-1024x500.png', w: 1024, h: 500 },
+        ]
+      },
+    ]
+  },
+  {
+    id: 'ios',
+    name: 'iOS (App Store)',
+    icon: '🍎',
+    sections: [
+      {
+        title: 'App Store & iPhone',
+        assets: [
+          { file: 'iOS/iPhone-29.png',       w: 29,   h: 29 },
+          { file: 'iOS/iPhone-40.png',       w: 40,   h: 40 },
+          { file: 'iOS/iPhone-58.png',       w: 58,   h: 58 },
+          { file: 'iOS/iPhone-60.png',       w: 60,   h: 60 },
+          { file: 'iOS/iPhone-80.png',       w: 80,   h: 80 },
+          { file: 'iOS/iPhone-87.png',       w: 87,   h: 87 },
+          { file: 'iOS/iPhone-120.png',      w: 120,  h: 120 },
+          { file: 'iOS/iPhone-180.png',      w: 180,  h: 180 },
+          { file: 'iOS/AppStore-1024.png',   w: 1024, h: 1024 },
+        ]
+      },
+      {
+        title: 'iPad',
+        assets: [
+          { file: 'iOS/iPad-20.png',   w: 20,  h: 20 },
+          { file: 'iOS/iPad-29.png',   w: 29,  h: 29 },
+          { file: 'iOS/iPad-40.png',   w: 40,  h: 40 },
+          { file: 'iOS/iPad-76.png',   w: 76,  h: 76 },
+          { file: 'iOS/iPad-80.png',   w: 80,  h: 80 },
+          { file: 'iOS/iPad-152.png',  w: 152, h: 152 },
+          { file: 'iOS/iPad-167.png',  w: 167, h: 167 },
+        ]
+      },
+    ]
+  },
+  {
+    id: 'macos',
+    name: 'macOS',
+    icon: '🍏',
+    sections: [
+      {
+        title: 'App Icon',
+        assets: [
+          { file: 'macOS/icon-16.png',   w: 16,   h: 16 },
+          { file: 'macOS/icon-32.png',   w: 32,   h: 32 },
+          { file: 'macOS/icon-64.png',   w: 64,   h: 64 },
+          { file: 'macOS/icon-128.png',  w: 128,  h: 128 },
+          { file: 'macOS/icon-256.png',  w: 256,  h: 256 },
+          { file: 'macOS/icon-512.png',  w: 512,  h: 512 },
+          { file: 'macOS/icon-1024.png', w: 1024, h: 1024 },
+        ]
+      },
+    ]
+  },
+  {
+    id: 'chrome',
+    name: 'Chrome Extension',
+    icon: '🌐',
+    sections: [
+      {
+        title: 'Extension Icons',
+        assets: [
+          { file: 'Chrome/icon-16.png',  w: 16,  h: 16 },
+          { file: 'Chrome/icon-32.png',  w: 32,  h: 32 },
+          { file: 'Chrome/icon-48.png',  w: 48,  h: 48 },
+          { file: 'Chrome/icon-128.png', w: 128, h: 128 },
+        ]
+      },
+      {
+        title: 'Chrome Web Store Graphics',
+        assets: [
+          { file: 'Chrome/store-icon-128.png',              w: 128,  h: 128 },
+          { file: 'Chrome/small-promo-tile-440x280.png',   w: 440,  h: 280 },
+          { file: 'Chrome/marquee-promo-tile-1400x560.png', w: 1400, h: 560 },
+        ]
+      },
+    ]
+  },
+  {
+    id: 'favicon',
+    name: 'Favicon (Browser Tab)',
+    icon: '🌐',
+    sections: [
+      {
+        title: 'Favicon Sizes',
+        assets: [
+          { file: 'Favicon/favicon-16x16.png',  w: 16,  h: 16 },
+          { file: 'Favicon/favicon-32x32.png',  w: 32,  h: 32 },
+          { file: 'Favicon/favicon-48x48.png',  w: 48,  h: 48 },
+          { file: 'Favicon/favicon-64x64.png',  w: 64,  h: 64 },
+          { file: 'Favicon/favicon-128x128.png',w: 128, h: 128 },
+          { file: 'Favicon/apple-touch-icon.png', w: 180, h: 180 },
+        ]
+      },
+    ]
+  },
+
+  {
+    id: 'social',
+    name: 'Social / OG Image',
+    icon: '🔗',
+    sections: [
+      {
+        title: 'Open Graph & Social Cards',
+        assets: [
+          { file: 'Social/og-image-1200x630.png',         w: 1200, h: 630 },
+          { file: 'Social/twitter-card-1200x628.png',      w: 1200, h: 628 },
+          { file: 'Social/linkedin-share-1200x627.png',    w: 1200, h: 627 },
+          { file: 'Social/facebook-cover-820x312.png',     w: 820,  h: 312 },
+          { file: 'Social/youtube-thumbnail-1280x720.png', w: 1280, h: 720 },
+        ]
+      },
+    ]
+  },
+
+  {
+    id: 'flatpak',
+    name: 'Flatpak (Flathub)',
+    icon: '📦',
+    sections: [
+      {
+        title: 'App Icons',
+        assets: [
+          { file: 'Flatpak/icon-64.png',  w: 64,  h: 64  },
+          { file: 'Flatpak/icon-128.png', w: 128, h: 128 },
+          { file: 'Flatpak/icon-256.png', w: 256, h: 256 },
+          { file: 'Flatpak/icon-512.png', w: 512, h: 512 },
+        ]
+      }
+    ]
+  }
+];
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+
+let sourceImage = null;   // HTMLImageElement
+let sourceFileName = '';
+let fitMode = 'contain';  // 'contain' or 'cover'
+let flutterNaming = false;
+let androidSafePaddingEnabled = false;
+
+const ANDROID_ADAPTIVE_FOREGROUND_SCALE = 0.565;
+const ANDROID_ADAPTIVE_BACKGROUND_COLOR = '#FFFFFF';
+const ANDROID_ADAPTIVE_FOREGROUNDS = [
+  { file: 'Android/mipmap-mdpi/ic_launcher_foreground.png', w: 108, h: 108 },
+  { file: 'Android/mipmap-hdpi/ic_launcher_foreground.png', w: 162, h: 162 },
+  { file: 'Android/mipmap-xhdpi/ic_launcher_foreground.png', w: 216, h: 216 },
+  { file: 'Android/mipmap-xxhdpi/ic_launcher_foreground.png', w: 324, h: 324 },
+  { file: 'Android/mipmap-xxxhdpi/ic_launcher_foreground.png', w: 432, h: 432 },
+];
+
+// Flutter naming convention map: original file → Flutter file
+const FLUTTER_NAMES = {
+  // iOS
+  'iOS/AppStore-1024.png':  'iOS/Icon-App-1024x1024@1x.png',
+  'iOS/iPhone-180.png':     'iOS/Icon-App-60x60@3x.png',
+  'iOS/iPhone-120.png':     'iOS/Icon-App-60x60@2x.png',
+  'iOS/iPhone-87.png':      'iOS/Icon-App-29x29@3x.png',
+  'iOS/iPhone-80.png':      'iOS/Icon-App-40x40@2x.png',
+  'iOS/iPhone-60.png':      'iOS/Icon-App-20x20@3x.png',
+  'iOS/iPhone-58.png':      'iOS/Icon-App-29x29@2x.png',
+  'iOS/iPhone-40.png':      'iOS/Icon-App-20x20@2x.png',
+  'iOS/iPhone-29.png':      'iOS/Icon-App-29x29@1x.png',
+  'iOS/iPad-20.png':        'iOS/Icon-App-20x20@1x.png',
+  'iOS/iPad-29.png':        'iOS/Icon-App-29x29@1x.png',
+  'iOS/iPad-40.png':        'iOS/Icon-App-20x20@2x.png',
+  'iOS/iPad-76.png':        'iOS/Icon-App-76x76@1x.png',
+  'iOS/iPad-80.png':        'iOS/Icon-App-40x40@2x.png',
+  'iOS/iPad-152.png':       'iOS/Icon-App-76x76@2x.png',
+  'iOS/iPad-167.png':       'iOS/Icon-App-83.5x83.5@2x.png',
+  // macOS
+  'macOS/icon-16.png':      'macOS/app_icon_16.png',
+  'macOS/icon-32.png':      'macOS/app_icon_32.png',
+  'macOS/icon-64.png':      'macOS/app_icon_64.png',
+  'macOS/icon-128.png':     'macOS/app_icon_128.png',
+  'macOS/icon-256.png':     'macOS/app_icon_256.png',
+  'macOS/icon-512.png':     'macOS/app_icon_512.png',
+  'macOS/icon-1024.png':    'macOS/app_icon_1024.png',
+  // Android
+  'Android/mipmap-mdpi/ic_launcher.png':    'Android/mipmap-mdpi/ic_launcher.png',
+  'Android/mipmap-hdpi/ic_launcher.png':    'Android/mipmap-hdpi/ic_launcher.png',
+  'Android/mipmap-xhdpi/ic_launcher.png':   'Android/mipmap-xhdpi/ic_launcher.png',
+  'Android/mipmap-xxhdpi/ic_launcher.png':  'Android/mipmap-xxhdpi/ic_launcher.png',
+  'Android/mipmap-xxxhdpi/ic_launcher.png': 'Android/mipmap-xxxhdpi/ic_launcher.png',
+  // Windows
+  'Windows/app_icon.ico':   'Windows/app_icon.ico',
+};
+
+// Selected assets: Set of "platformId/file"
+const selectedAssets = new Set();
+
+// ─────────────────────────────────────────────
+// INIT UI
+// ─────────────────────────────────────────────
+
+function init() {
+  buildPlatformCards();
+
+  const dz = document.getElementById('dropzone');
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault();
+    dz.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) loadFile(file);
+  });
+  dz.addEventListener('click', e => {
+    if (e.target.closest('#imagePreview')) return;
+    document.getElementById('fileInput').click();
+  });
+
+  document.getElementById('fileInput').addEventListener('change', e => {
+    if (e.target.files[0]) loadFile(e.target.files[0]);
+  });
+}
+
+function buildPlatformCards() {
+  const grid = document.getElementById('platformsGrid');
+  PLATFORMS.forEach(p => {
+    const total = p.sections.reduce((s, sec) => s + sec.assets.length, 0);
+    const card = document.createElement('div');
+    card.className = 'platform-card';
+    card.id = 'card-' + p.id;
+    card.innerHTML = `
+      <div class="platform-header">
+        <span class="platform-icon">${p.icon}</span>
+        <span class="platform-name">${p.name}</span>
+        <div class="platform-check"></div>
+      </div>
+      <div class="platform-count">${total} assets available</div>
+    `;
+    card.addEventListener('click', () => togglePlatform(p.id));
+    grid.appendChild(card);
+  });
+}
+
+// ─────────────────────────────────────────────
+// PLATFORM TOGGLE
+// ─────────────────────────────────────────────
+
+function togglePlatform(platformId) {
+  const card = document.getElementById('card-' + platformId);
+  const isSelected = card.classList.contains('selected');
+
+  if (isSelected) {
+    card.classList.remove('selected');
+    card.querySelector('.platform-check').textContent = '';
+    // Deselect all assets of this platform
+    const p = PLATFORMS.find(x => x.id === platformId);
+    p.sections.forEach(sec => sec.assets.forEach(a => {
+      selectedAssets.delete(platformId + '/' + a.file);
+    }));
+  } else {
+    card.classList.add('selected');
+    card.querySelector('.platform-check').textContent = '✓';
+    // Select all assets of this platform
+    const p = PLATFORMS.find(x => x.id === platformId);
+    p.sections.forEach(sec => sec.assets.forEach(a => {
+      selectedAssets.add(platformId + '/' + a.file);
+    }));
+  }
+
+  rebuildAssetPanel();
+  updateSummary();
+  updateGenerateBtn();
+}
+
+// ─────────────────────────────────────────────
+// ASSET PANEL
+// ─────────────────────────────────────────────
+
+function rebuildAssetPanel() {
+  const panel = document.getElementById('assetPanel');
+  const selectedPlatforms = PLATFORMS.filter(p =>
+    document.getElementById('card-' + p.id)?.classList.contains('selected')
+  );
+
+  if (selectedPlatforms.length === 0) {
+    panel.classList.remove('visible');
+    panel.innerHTML = '';
+    return;
+  }
+
+  panel.classList.add('visible');
+  panel.innerHTML = '';
+
+  const header = document.createElement('div');
+  header.className = 'asset-panel-header';
+  header.innerHTML = `
+    <div class="asset-panel-title">📋 <span>Select assets to generate</span></div>
+    <div class="asset-panel-actions">
+      <button class="btn-sm" onclick="selectAll()">All</button>
+      <button class="btn-sm" onclick="selectNone()">None</button>
+    </div>
+  `;
+  panel.appendChild(header);
+
+  selectedPlatforms.forEach(p => {
+    p.sections.forEach(sec => {
+      const section = document.createElement('div');
+      section.className = 'asset-section';
+
+      const stitle = document.createElement('div');
+      stitle.className = 'asset-section-title';
+      stitle.textContent = `${p.icon} ${p.name} — ${sec.title}`;
+      section.appendChild(stitle);
+
+      const list = document.createElement('div');
+      list.className = 'asset-list';
+
+      sec.assets.forEach(a => {
+        const key = p.id + '/' + a.file;
+        const item = document.createElement('div');
+        item.className = 'asset-item' + (selectedAssets.has(key) ? ' checked' : '');
+        item.dataset.key = key;
+        item.innerHTML = `
+          <div class="asset-cb">${selectedAssets.has(key) ? '✓' : ''}</div>
+          <span class="asset-name">${(flutterNaming && FLUTTER_NAMES[a.file] ? FLUTTER_NAMES[a.file] : a.file).split('/').pop()}</span>
+          <span class="asset-size">${a.w}×${a.h}</span>
+        `;
+        item.addEventListener('click', () => toggleAsset(key, item));
+        list.appendChild(item);
+      });
+
+      section.appendChild(list);
+      panel.appendChild(section);
+    });
+  });
+}
+
+function toggleAsset(key, el) {
+  if (selectedAssets.has(key)) {
+    selectedAssets.delete(key);
+    el.classList.remove('checked');
+    el.querySelector('.asset-cb').textContent = '';
+  } else {
+    selectedAssets.add(key);
+    el.classList.add('checked');
+    el.querySelector('.asset-cb').textContent = '✓';
+  }
+  updateSummary();
+  updateGenerateBtn();
+}
+
+function selectAll() {
+  document.querySelectorAll('.asset-item').forEach(el => {
+    const key = el.dataset.key;
+    selectedAssets.add(key);
+    el.classList.add('checked');
+    el.querySelector('.asset-cb').textContent = '✓';
+  });
+  updateSummary();
+  updateGenerateBtn();
+}
+
+function selectNone() {
+  document.querySelectorAll('.asset-item').forEach(el => {
+    const key = el.dataset.key;
+    selectedAssets.delete(key);
+    el.classList.remove('checked');
+    el.querySelector('.asset-cb').textContent = '';
+  });
+  updateSummary();
+  updateGenerateBtn();
+}
+
+// ─────────────────────────────────────────────
+// OPTIONS
+// ─────────────────────────────────────────────
+
+function setToggleChecked(id, checked) {
+  const toggle = document.getElementById(id);
+  toggle.classList.toggle('on', checked);
+  toggle.querySelector('.toggle-box').textContent = checked ? '✓' : '';
+}
+
+function toggleOption(id, mode) {
+  fitMode = mode;
+  setToggleChecked('toggleContain', mode === 'contain');
+  setToggleChecked('toggleCover', mode === 'cover');
+}
+
+function toggleFlutter() {
+  flutterNaming = !flutterNaming;
+  setToggleChecked('toggleFlutter', flutterNaming);
+  rebuildAssetPanel();
+}
+
+function toggleAndroidSafePadding() {
+  androidSafePaddingEnabled = !androidSafePaddingEnabled;
+  setToggleChecked('toggleAndroidSafePadding', androidSafePaddingEnabled);
+  updateSummary();
+}
+
+// ─────────────────────────────────────────────
+// IMAGE LOAD
+// ─────────────────────────────────────────────
+
+function loadFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      sourceImage = img;
+      sourceFileName = file.name;
+      showPreview(img, file.name);
+      updateGenerateBtn();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function showPreview(img, name) {
+  const dz = document.getElementById('dropzone');
+  dz.classList.add('has-image');
+  dz.querySelector('.dropzone-icon').style.display = 'none';
+  dz.querySelectorAll('.dropzone-text').forEach(el => el.style.display = 'none');
+
+  const preview = document.getElementById('imagePreview');
+  preview.style.display = 'flex';
+  document.getElementById('previewImg').src = img.src;
+  document.getElementById('previewName').textContent = name;
+  document.getElementById('previewDims').textContent = `${img.width} × ${img.height} px`;
+}
+
+// ─────────────────────────────────────────────
+// SUMMARY
+// ─────────────────────────────────────────────
+
+function updateSummary() {
+  const bar = document.getElementById('summaryBar');
+  const count = selectedAssets.size;
+  if (count === 0) {
+    bar.innerHTML = 'Select platforms and assets above to see a summary.';
+    return;
+  }
+
+  // Count per platform
+  const perPlatform = {};
+  selectedAssets.forEach(key => {
+    const pid = key.split('/')[0];
+    perPlatform[pid] = (perPlatform[pid] || 0) + 1;
+  });
+
+  const parts = Object.entries(perPlatform).map(([pid, n]) => {
+    const p = PLATFORMS.find(x => x.id === pid);
+    return `${p.icon} ${n} ${p.name}`;
+  });
+
+  const extras = [];
+  if (androidSafePaddingEnabled && perPlatform.android) {
+    extras.push('Android adaptive icon padding');
+  }
+
+  bar.innerHTML = `<span class="count">${count} assets</span> selected — ${parts.join(' &nbsp;·&nbsp; ')}${extras.length ? ` &nbsp;+&nbsp; ${extras.join(' + ')}` : ''}`;
+}
+
+function updateGenerateBtn() {
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = !(sourceImage && selectedAssets.size > 0);
+}
+
+// ─────────────────────────────────────────────
+// IMAGE RENDERING
+// ─────────────────────────────────────────────
+
+function renderContain(src, w, h) {
+  const canvas = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, w, h);
+
+  const scale = Math.min(w / src.width, h / src.height);
+  const nw = Math.max(1, Math.min(w, Math.round(src.width * scale)));
+  const nh = Math.max(1, Math.min(h, Math.round(src.height * scale)));
+  const x = Math.floor((w - nw) / 2);
+  const y = Math.floor((h - nh) / 2);
+
+  ctx.drawImage(src, x, y, nw, nh);
+  return canvas;
+}
+
+function renderCover(src, w, h) {
+  const canvas = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, w, h);
+
+  const scale = Math.max(w / src.width, h / src.height);
+  const nw = Math.round(src.width * scale);
+  const nh = Math.round(src.height * scale);
+  const x = Math.floor((w - nw) / 2);
+  const y = Math.floor((h - nh) / 2);
+
+  ctx.drawImage(src, x, y, nw, nh);
+  return canvas;
+}
+
+function renderPaddedContain(src, w, h, maxScale) {
+  const canvas = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, w, h);
+
+  const maxW = Math.max(1, Math.round(w * maxScale));
+  const maxH = Math.max(1, Math.round(h * maxScale));
+  const scale = Math.min(maxW / src.width, maxH / src.height);
+  const nw = Math.max(1, Math.min(maxW, Math.round(src.width * scale)));
+  const nh = Math.max(1, Math.min(maxH, Math.round(src.height * scale)));
+  const x = Math.floor((w - nw) / 2);
+  const y = Math.floor((h - nh) / 2);
+
+  ctx.drawImage(src, x, y, nw, nh);
+  return canvas;
+}
+
+function androidAdaptiveIconXml() {
+  return `<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@drawable/ic_launcher_background" />
+    <foreground android:drawable="@mipmap/ic_launcher_foreground" />
+</adaptive-icon>
+`;
+}
+
+function androidAdaptiveBackgroundXml() {
+  return `<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="${ANDROID_ADAPTIVE_BACKGROUND_COLOR}"
+        android:pathData="M0,0h108v108h-108z" />
+</vector>
+`;
+}
+
+async function addAndroidAdaptiveIconFiles(zip, src) {
+  let added = 0;
+
+  zip.file('Android/mipmap-anydpi-v26/ic_launcher.xml', androidAdaptiveIconXml());
+  zip.file('Android/mipmap-anydpi-v26/ic_launcher_round.xml', androidAdaptiveIconXml());
+  zip.file('Android/drawable/ic_launcher_background.xml', androidAdaptiveBackgroundXml());
+  zip.file('Android/README-adaptive-icon.txt', [
+    'Android adaptive launcher icon files generated with safe padding.',
+    '',
+    'Copy these folders into android/app/src/main/res:',
+    '- mipmap-anydpi-v26',
+    '- mipmap-mdpi through mipmap-xxxhdpi foreground PNGs',
+    '- drawable/ic_launcher_background.xml',
+    '',
+    'Your AndroidManifest.xml should use:',
+    'android:icon="@mipmap/ic_launcher"',
+    'android:roundIcon="@mipmap/ic_launcher_round"',
+    '',
+    'The foreground image is centered at 56.5% of the adaptive icon canvas with a white background, which prevents launcher masks from cropping the logo.',
+  ].join('\n'));
+  added += 4;
+
+  for (const spec of ANDROID_ADAPTIVE_FOREGROUNDS) {
+    const canvas = renderPaddedContain(src, spec.w, spec.h, ANDROID_ADAPTIVE_FOREGROUND_SCALE);
+    const blob = await canvasToBlob(canvas);
+    const arrayBuffer = await blob.arrayBuffer();
+    zip.file(spec.file, arrayBuffer);
+    added++;
+  }
+
+  return added;
+}
+
+// ─── Badge Logo Processing ───────────────────
+
+function renderBadgeLogo(src, w, h) {
+  // Step 1: render at 256x256 with contain
+  const base = renderContain(src, 256, 256);
+  const baseCtx = base.getContext('2d');
+  let imgData = baseCtx.getImageData(0, 0, 256, 256);
+
+  // Step 2: prepare glyph (remove background)
+  imgData = prepareBadgeGlyph(imgData, 256, 256);
+
+  // Step 3: write back to canvas, then crop to foreground
+  baseCtx.putImageData(imgData, 0, 0);
+  const cropped = cropToForeground(base, 32, 0.12);
+
+  // Step 4: resize/contain to target and force WACK-compliant pixels.
+  // Use putImageData (not drawImage) for the final write to avoid
+  // browser alpha-premultiplication artefacts that can leave stray
+  // coloured pixels (e.g. at position 0,0).
+  const resized = renderContain(cropped, w, h);
+  const finalCanvas = document.createElement('canvas');
+  finalCanvas.width = w; finalCanvas.height = h;
+  const finalCtx = finalCanvas.getContext('2d');
+  const finalData = resized.getContext('2d').getImageData(0, 0, w, h);
+  forceWhiteRGBA(finalData);
+  finalCtx.putImageData(finalData, 0, 0);
+  return finalCanvas;
+}
+
+function prepareBadgeGlyph(imgData, W, H) {
+  const before = countAlphaAbove(imgData, 16);
+
+  // Attempt: dominant color masking
+  let attempt = cloneImageData(imgData, W, H);
+  if (tryMaskByDominantColor(attempt, W, H)) {
+    if (isMaskGood(before, attempt, 16)) return attempt;
+  }
+
+  // Attempt: edge background mask
+  attempt = cloneImageData(imgData, W, H);
+  if (tryEdgeBackgroundMask(attempt, W, H)) {
+    if (isMaskGood(before, attempt, 16)) return attempt;
+  }
+
+  // Attempt: luminance mask
+  attempt = cloneImageData(imgData, W, H);
+  applyLuminanceMask(attempt, W, H);
+  if (countAlphaAbove(attempt, 16) > 10) return attempt;
+
+  // Fallback: use original, force white
+  const fallback = cloneImageData(imgData, W, H);
+  forceWhiteRGBA(fallback);
+  return fallback;
+}
+
+function cloneImageData(imgData, W, H) {
+  const d = new Uint8ClampedArray(imgData.data);
+  return new ImageData(d, W, H);
+}
+
+function countAlphaAbove(imgData, threshold) {
+  const data = imgData.data;
+  let count = 0;
+  for (let i = 3; i < data.length; i += 4) if (data[i] > threshold) count++;
+  return count;
+}
+
+function isMaskGood(before, imgData, threshold) {
+  const after = countAlphaAbove(imgData, threshold);
+  if (after <= 10) return false;
+  return after / Math.max(1, before) < 0.85;
+}
+
+function estimateDominantColor(data) {
+  const buckets = new Int32Array(4096);
+  let visible = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i+3] === 0) continue;
+    visible++;
+    const key = ((data[i] >> 4) << 8) | ((data[i+1] >> 4) << 4) | (data[i+2] >> 4);
+    buckets[key]++;
+  }
+  if (visible === 0) return { r: 255, g: 255, b: 255, ratio: 1, count: 0 };
+  let best = 0, bestCount = -1;
+  for (let i = 0; i < 4096; i++) if (buckets[i] > bestCount) { bestCount = buckets[i]; best = i; }
+  return {
+    r: ((best >> 8) & 0xF) * 16 + 8,
+    g: ((best >> 4) & 0xF) * 16 + 8,
+    b: (best & 0xF) * 16 + 8,
+    ratio: bestCount / visible,
+    count: visible
+  };
+}
+
+function colorDist(r, g, b, br, bg, bb) {
+  const dr = r - br, dg = g - bg, db = b - bb;
+  return Math.sqrt(dr*dr + dg*dg + db*db);
+}
+
+function otsuThreshold(hist, total) {
+  let sum = 0;
+  for (let i = 0; i < 256; i++) sum += i * hist[i];
+  let sumB = 0, wB = 0, varMax = -1, thr = 0;
+  for (let i = 0; i < 256; i++) {
+    wB += hist[i];
+    if (wB === 0) continue;
+    const wF = total - wB;
+    if (wF === 0) break;
+    sumB += i * hist[i];
+    const mB = sumB / wB, mF = (sum - sumB) / wF;
+    const diff = mB - mF;
+    const v = wB * wF * diff * diff;
+    if (v > varMax) { varMax = v; thr = i; }
+  }
+  return thr;
+}
+
+const MAX_DIST = Math.sqrt(255*255*3);
+
+function tryMaskByDominantColor(imgData, W, H) {
+  const data = imgData.data;
+  const dom = estimateDominantColor(data);
+  if (dom.count < 200 || dom.ratio < 0.22) return false;
+
+  // Check max distance
+  let maxDist = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i+3] === 0) continue;
+    const d = colorDist(data[i], data[i+1], data[i+2], dom.r, dom.g, dom.b);
+    if (d > maxDist) maxDist = d;
+  }
+  if (maxDist < 18) return false;
+
+  // Build histogram
+  const hist = new Int32Array(256);
+  let total = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i+3] === 0) continue;
+    const d = colorDist(data[i], data[i+1], data[i+2], dom.r, dom.g, dom.b);
+    const bin = Math.min(255, Math.round((d / MAX_DIST) * 255));
+    hist[bin]++;
+    total++;
+  }
+  if (total < 200) return false;
+
+  const thrBin = otsuThreshold(hist, total);
+  const thrDist = (thrBin / 255) * MAX_DIST;
+  const softness = 10;
+
+  for (let i = 0; i < data.length; i += 4) {
+    const a0 = data[i+3];
+    if (a0 === 0) { data[i] = 255; data[i+1] = 255; data[i+2] = 255; continue; }
+    const d = colorDist(data[i], data[i+1], data[i+2], dom.r, dom.g, dom.b);
+    let t = (d - (thrDist - softness)) / (2 * softness);
+    t = Math.max(0, Math.min(1, t));
+    let a = Math.round(255 * (a0 / 255) * t);
+    if (a < 18) a = 0; else if (a > 245) a = 255;
+    data[i] = 255; data[i+1] = 255; data[i+2] = 255; data[i+3] = a;
+  }
+  return true;
+}
+
+function tryEdgeBackgroundMask(imgData, W, H) {
+  const data = imgData.data;
+  const thickness = Math.max(2, Math.min(24, Math.floor(Math.min(W, H) / 12)));
+  const buckets = new Int32Array(4096);
+  let borderCount = 0;
+
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const yb = y < thickness || y >= H - thickness;
+      const xb = x < thickness || x >= W - thickness;
+      if (!yb && !xb) continue;
+      const i = (y * W + x) * 4;
+      if (data[i+3] === 0) continue;
+      borderCount++;
+      const key = ((data[i] >> 4) << 8) | ((data[i+1] >> 4) << 4) | (data[i+2] >> 4);
+      buckets[key]++;
+    }
+  }
+
+  if (borderCount < 200) return false;
+  let best = 0, bestCount = -1;
+  for (let i = 0; i < 4096; i++) if (buckets[i] > bestCount) { bestCount = buckets[i]; best = i; }
+  if (bestCount / borderCount < 0.28) return false;
+
+  const bgR = ((best >> 8) & 0xF) * 16 + 8;
+  const bgG = ((best >> 4) & 0xF) * 16 + 8;
+  const bgB = (best & 0xF) * 16 + 8;
+
+  for (let i = 0; i < data.length; i += 4) {
+    const a0 = data[i+3];
+    if (a0 === 0) { data[i] = 255; data[i+1] = 255; data[i+2] = 255; continue; }
+    const d = colorDist(data[i], data[i+1], data[i+2], bgR, bgG, bgB);
+    let t = (d - 16) / (64 - 16);
+    t = Math.max(0, Math.min(1, t));
+    let a = Math.round(255 * (a0 / 255) * t);
+    if (a < 18) a = 0; else if (a > 245) a = 255;
+    data[i] = 255; data[i+1] = 255; data[i+2] = 255; data[i+3] = a;
+  }
+  return true;
+}
+
+function applyLuminanceMask(imgData, W, H) {
+  const data = imgData.data;
+  const thickness = Math.max(2, Math.min(24, Math.floor(Math.min(W, H) / 12)));
+  let sumLum = 0, count = 0;
+
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const yb = y < thickness || y >= H - thickness;
+      const xb = x < thickness || x >= W - thickness;
+      if (!yb && !xb) continue;
+      const i = (y * W + x) * 4;
+      if (data[i+3] === 0) continue;
+      sumLum += (0.2126 * data[i] + 0.7152 * data[i+1] + 0.0722 * data[i+2]) / 255;
+      count++;
+    }
+  }
+
+  const borderLum = count === 0 ? 1 : sumLum / count;
+  const bgIsLight = borderLum >= 0.55;
+
+  for (let i = 0; i < data.length; i += 4) {
+    const a0 = data[i+3];
+    if (a0 === 0) { data[i] = 255; data[i+1] = 255; data[i+2] = 255; continue; }
+    const lum = (0.2126 * data[i] + 0.7152 * data[i+1] + 0.0722 * data[i+2]) / 255;
+    let a01 = bgIsLight ? (1 - lum) : lum;
+    a01 = Math.pow(a01, 0.85);
+    let a = Math.round(a01 * 255);
+    if (a < 22) a = 0; else if (a > 245) a = 255;
+    data[i] = 255; data[i+1] = 255; data[i+2] = 255; data[i+3] = a;
+  }
+}
+
+function forceWhiteRGBA(imgData, alphaFloor = 16) {
+  const data = imgData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i+3] < alphaFloor) {
+      data[i] = 0; data[i+1] = 0; data[i+2] = 0; data[i+3] = 0;
+      continue;
+    }
+    data[i] = 255; data[i+1] = 255; data[i+2] = 255;
+  }
+}
+
+function forceWhiteKeepAlpha(canvas) {
+  const ctx = canvas.getContext('2d');
+  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  forceWhiteRGBA(imgData);
+  ctx.putImageData(imgData, 0, 0);
+}
+
+function cropToForeground(canvas, alphaThreshold, padFraction) {
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const imgData = ctx.getImageData(0, 0, W, H);
+  const data = imgData.data;
+
+  let minX = W, minY = H, maxX = -1, maxY = -1;
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      if (data[(y * W + x) * 4 + 3] <= alphaThreshold) continue;
+      if (x < minX) minX = x;
+      if (y < minY) minY = y;
+      if (x > maxX) maxX = x;
+      if (y > maxY) maxY = y;
+    }
+  }
+
+  if (maxX < 0) return canvas;
+  const w = maxX - minX + 1, h = maxY - minY + 1;
+  const pad = Math.round(Math.max(w, h) * padFraction);
+  const x0 = Math.max(0, minX - pad), y0 = Math.max(0, minY - pad);
+  const x1 = Math.min(W - 1, maxX + pad), y1 = Math.min(H - 1, maxY + pad);
+  const cw = x1 - x0 + 1, ch = y1 - y0 + 1;
+
+  const out = document.createElement('canvas');
+  out.width = cw; out.height = ch;
+  out.getContext('2d').drawImage(canvas, x0, y0, cw, ch, 0, 0, cw, ch);
+  return out;
+}
+
+// ─────────────────────────────────────────────
+// CANVAS → PNG BLOB
+// ─────────────────────────────────────────────
+
+function canvasToBlob(canvas) {
+  return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+}
+
+// ─────────────────────────────────────────────
+// MANUAL PNG ENCODER (bypasses canvas.toBlob to
+// avoid browser alpha-premultiplication artifacts)
+// ─────────────────────────────────────────────
+
+const _crc32Table = new Uint32Array(256);
+for (let n = 0; n < 256; n++) {
+  let c = n;
+  for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+  _crc32Table[n] = c;
+}
+
+function _crc32(buf) {
+  let crc = 0xFFFFFFFF;
+  for (let i = 0; i < buf.length; i++) crc = _crc32Table[(crc ^ buf[i]) & 0xFF] ^ (crc >>> 8);
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+
+function _adler32(buf) {
+  let a = 1, b = 0;
+  for (let i = 0; i < buf.length; i++) { a = (a + buf[i]) % 65521; b = (b + a) % 65521; }
+  return (b << 16) | a;
+}
+
+function _pngChunk(type, data) {
+  const chunk = new Uint8Array(4 + 4 + data.length + 4);
+  const view = new DataView(chunk.buffer);
+  view.setUint32(0, data.length);
+  for (let i = 0; i < 4; i++) chunk[4 + i] = type.charCodeAt(i);
+  chunk.set(data, 8);
+  view.setUint32(8 + data.length, _crc32(chunk.subarray(4, 8 + data.length)));
+  return chunk;
+}
+
+function buildPNGFromRGBA(w, h, rgba) {
+  // Build filtered rows (filter byte 0 = None per row)
+  const rowBytes = w * 4;
+  const filtered = new Uint8Array(h * (1 + rowBytes));
+  for (let y = 0; y < h; y++) {
+    filtered[y * (1 + rowBytes)] = 0;
+    filtered.set(rgba.subarray(y * rowBytes, (y + 1) * rowBytes), y * (1 + rowBytes) + 1);
+  }
+
+  // Zlib stored (no compression): header + stored blocks + adler32
+  const maxBlock = 65535;
+  const numBlocks = Math.ceil(filtered.length / maxBlock) || 1;
+  let zlibLen = 2; // CMF + FLG
+  for (let i = 0; i < numBlocks; i++) zlibLen += 5 + Math.min(maxBlock, filtered.length - i * maxBlock);
+  zlibLen += 4; // adler32
+  const zlib = new Uint8Array(zlibLen);
+  const zview = new DataView(zlib.buffer);
+  let off = 0;
+  zlib[off++] = 0x78; zlib[off++] = 0x01;
+  for (let i = 0; i < numBlocks; i++) {
+    const start = i * maxBlock;
+    const len = Math.min(maxBlock, filtered.length - start);
+    zlib[off++] = (i === numBlocks - 1) ? 1 : 0;
+    zview.setUint16(off, len, true); off += 2;
+    zview.setUint16(off, len ^ 0xFFFF, true); off += 2;
+    zlib.set(filtered.subarray(start, start + len), off); off += len;
+  }
+  zview.setUint32(off, _adler32(filtered));
+
+  // IHDR data
+  const ihdr = new Uint8Array(13);
+  const iv = new DataView(ihdr.buffer);
+  iv.setUint32(0, w); iv.setUint32(4, h);
+  ihdr[8] = 8; ihdr[9] = 6; // 8-bit RGBA
+
+  // Assemble PNG
+  const sig = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
+  const chunks = [sig, _pngChunk('IHDR', ihdr), _pngChunk('IDAT', zlib), _pngChunk('IEND', new Uint8Array(0))];
+  const total = chunks.reduce((s, c) => s + c.length, 0);
+  const png = new Uint8Array(total);
+  let p = 0;
+  for (const c of chunks) { png.set(c, p); p += c.length; }
+  return png.buffer;
+}
+
+// ─────────────────────────────────────────────
+// LOGGING
+// ─────────────────────────────────────────────
+
+function log(msg, type = 'info') {
+  const out = document.getElementById('logOutput');
+  const line = document.createElement('div');
+  line.className = 'log-' + type;
+  line.textContent = `[${new Date().toTimeString().slice(0,8)}] ${msg}`;
+  out.appendChild(line);
+  out.scrollTop = out.scrollHeight;
+}
+
+// ─────────────────────────────────────────────
+// ICO BUILDER
+// ─────────────────────────────────────────────
+
+function buildIco(src) {
+  // Build a multi-resolution ICO containing 16, 32, 48, 64, 128, 256px sizes
+  const sizes = [16, 32, 48, 64, 128, 256];
+  const pngBlobs = [];
+
+  for (const s of sizes) {
+    const canvas = renderContain(src, s, s);
+    const ctx = canvas.getContext('2d');
+    const imgData = ctx.getImageData(0, 0, s, s);
+
+    // Encode as BMP-style ICO entry (BITMAPINFOHEADER + pixel data)
+    // For sizes > 48, use PNG embedding instead for better quality
+    if (s > 48) {
+      // We'll collect PNG data in next step
+      pngBlobs.push({ size: s, canvas });
+    } else {
+      pngBlobs.push({ size: s, canvas });
+    }
+  }
+
+  // Use PNG-embedded ICO for all sizes (modern ICO format, widely supported)
+  return new Promise(async (resolve) => {
+    const entries = [];
+    for (const { size, canvas } of pngBlobs) {
+      const blob = await canvasToBlob(canvas);
+      const buf = await blob.arrayBuffer();
+      entries.push({ size, data: new Uint8Array(buf) });
+    }
+
+    // ICO header: 6 bytes
+    // Each directory entry: 16 bytes
+    const headerSize = 6 + entries.length * 16;
+    let dataOffset = headerSize;
+    const totalSize = headerSize + entries.reduce((sum, e) => sum + e.data.length, 0);
+
+    const ico = new ArrayBuffer(totalSize);
+    const view = new DataView(ico);
+
+    // ICONDIR header
+    view.setUint16(0, 0, true);              // reserved
+    view.setUint16(2, 1, true);              // type: 1 = ICO
+    view.setUint16(4, entries.length, true);  // count
+
+    // ICONDIRENTRY for each image
+    for (let i = 0; i < entries.length; i++) {
+      const e = entries[i];
+      const offset = 6 + i * 16;
+      view.setUint8(offset + 0, e.size >= 256 ? 0 : e.size); // width (0 = 256)
+      view.setUint8(offset + 1, e.size >= 256 ? 0 : e.size); // height
+      view.setUint8(offset + 2, 0);   // color palette
+      view.setUint8(offset + 3, 0);   // reserved
+      view.setUint16(offset + 4, 1, true);  // color planes
+      view.setUint16(offset + 6, 32, true); // bits per pixel
+      view.setUint32(offset + 8, e.data.length, true);  // data size
+      view.setUint32(offset + 12, dataOffset, true);     // data offset
+      dataOffset += e.data.length;
+    }
+
+    // Write PNG data
+    let writePos = headerSize;
+    for (const e of entries) {
+      new Uint8Array(ico).set(e.data, writePos);
+      writePos += e.data.length;
+    }
+
+    resolve(ico);
+  });
+}
+
+// ─────────────────────────────────────────────
+// GENERATE
+// ─────────────────────────────────────────────
+
+async function generate() {
+  const btn = document.getElementById('generateBtn');
+  const logPanel = document.getElementById('logPanel');
+
+  btn.classList.add('loading');
+  btn.disabled = true;
+  logPanel.classList.add('visible');
+  document.getElementById('logOutput').innerHTML = '';
+
+  log('Starting asset generation...', 'info');
+
+  const zip = new JSZip();
+  let created = 0, errors = 0;
+
+  // Build a lookup: key → asset spec
+  const assetMap = {};
+  PLATFORMS.forEach(p => {
+    p.sections.forEach(sec => {
+      sec.assets.forEach(a => {
+        assetMap[p.id + '/' + a.file] = { ...a, platformId: p.id };
+      });
+    });
+  });
+
+  const hasAndroidSelection = [...selectedAssets].some(key => key.startsWith('android/'));
+
+  for (const key of selectedAssets) {
+    const spec = assetMap[key];
+    if (!spec) continue;
+
+    let outFile = spec.file;
+
+    try {
+      // Determine output filename (Flutter naming if enabled)
+      if (flutterNaming && FLUTTER_NAMES[spec.file]) {
+        outFile = FLUTTER_NAMES[spec.file];
+      }
+
+      if (spec.ico) {
+        // Build multi-resolution ICO file
+        const icoBuffer = await buildIco(sourceImage);
+        zip.file(outFile, icoBuffer);
+      } else if (spec.badge) {
+        // Badge logos: encode PNG manually to bypass canvas.toBlob()
+        // alpha-premultiplication artifacts that break WACK validation
+        const canvas = renderBadgeLogo(sourceImage, spec.w, spec.h);
+        const imgData = canvas.getContext('2d').getImageData(0, 0, spec.w, spec.h);
+        forceWhiteRGBA(imgData); // final guarantee
+        const pngBuffer = buildPNGFromRGBA(spec.w, spec.h, imgData.data);
+        zip.file(outFile, pngBuffer);
+      } else {
+        let canvas;
+        if (fitMode === 'cover') {
+          canvas = renderCover(sourceImage, spec.w, spec.h);
+        } else {
+          canvas = renderContain(sourceImage, spec.w, spec.h);
+        }
+
+        const blob = await canvasToBlob(canvas);
+        const arrayBuffer = await blob.arrayBuffer();
+        zip.file(outFile, arrayBuffer);
+      }
+
+      log(`OK  ${outFile}  (${spec.w}×${spec.h})`, 'ok');
+      created++;
+    } catch (err) {
+      log(`ERR ${outFile}: ${err.message}`, 'err');
+      errors++;
+    }
+
+    // Yield to browser
+    await new Promise(r => setTimeout(r, 0));
+  }
+
+  if (androidSafePaddingEnabled && hasAndroidSelection) {
+    log('Adding Android adaptive icon safe-padding files...', 'info');
+    try {
+      const added = await addAndroidAdaptiveIconFiles(zip, sourceImage);
+      created += added;
+      log(`OK  Android adaptive icon safe-padding files (${added} files)`, 'ok');
+    } catch (err) {
+      log(`ERR Android adaptive icon safe-padding files: ${err.message}`, 'err');
+      errors++;
+    }
+  }
+
+  log(`Done. ${created} created, ${errors} errors.`, 'info');
+
+  // Generate zip
+  log('Compressing ZIP...', 'info');
+  const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
+
+  // Download
+  const url = URL.createObjectURL(zipBlob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'visual-assets.zip';
+  a.click();
+  URL.revokeObjectURL(url);
+
+  log('ZIP downloaded!', 'ok');
+
+  btn.classList.remove('loading');
+  btn.disabled = false;
+}
+
+// ─────────────────────────────────────────────
+// START
+// ─────────────────────────────────────────────
+
+init();
+</script>
+
+<!-- ── Cookie / Privacy logic ── -->
+<script>
+function hideBanner() { document.getElementById('cookieBanner').style.display = 'none'; }
+function acceptCookies() {
+  localStorage.setItem('cookie-consent', 'accepted');
+  hideBanner();
+  initGtag();
+}
+function rejectCookies() {
+  localStorage.setItem('cookie-consent', 'rejected');
+  hideBanner();
+}
+
+const POLICY = {
+  privacyTitle: 'Privacy Policy',
+  cookiesTitle: 'Cookie Policy',
+  privacyHtml: `
+    <h3>Data controller</h3>
+    <p>This site is operated by EERIE (<a href="https://eeriegoesd.com" target="_blank" style="color:var(--accent)">eeriegoesd.com</a>).</p>
+
+    <h3>Data collected</h3>
+    <p>We use Google Analytics 4 (GA4) for anonymous traffic analysis. When you accept cookies, GA4 collects:</p>
+    <ul>
+      <li>IP address (anonymized)</li>
+      <li>Pages visited and visit duration</li>
+      <li>Device type, browser, and operating system</li>
+      <li>Country/region of origin</li>
+    </ul>
+    <p>We do not collect names, emails, or any personally identifiable information. There are no accounts or contact forms.</p>
+
+    <h3>Purpose</h3>
+    <p>Data is used solely to understand how the site is used and improve the user experience.</p>
+
+    <h3>Legal basis</h3>
+    <p>Consent (Article 6(1)(a) GDPR). Analytics cookies are only activated after accepting the cookie banner.</p>
+
+    <h3>Data sharing</h3>
+    <p>GA4 data is processed by Google Ireland Ltd. Google operates under the EU-US Data Privacy Framework.</p>
+
+    <h3>Retention</h3>
+    <p>GA4 data is retained for 14 months. Cookies expire as indicated in the Cookie Policy.</p>
+
+    <h3>Your rights</h3>
+    <p>Under GDPR, you have the right to: access, rectify, erase your data, restrict processing, data portability, and object to processing. You can withdraw consent at any time by clearing browser cookies or clicking "Decline" on the banner. For questions, contact us at <a href="https://eeriegoesd.com" target="_blank" style="color:var(--accent)">eeriegoesd.com</a>.</p>
+
+    <h3>Supervisory authority</h3>
+    <p>You may file a complaint with the CNPD (Portuguese Data Protection Authority) at <a href="https://www.cnpd.pt" target="_blank" style="color:var(--accent)">cnpd.pt</a>.</p>
+  `,
+  cookiesHtml: `
+    <h3>What are cookies?</h3>
+    <p>Cookies are small text files stored in your browser that help analyze site usage.</p>
+
+    <h3>Cookies used</h3>
+    <ul>
+      <li><strong>_ga</strong> — Distinguishes unique users. Duration: 2 years. Type: Analytics (Google Analytics).</li>
+      <li><strong>_ga_G-FZ24TLKL16</strong> — Maintains session state. Duration: 2 years. Type: Analytics (Google Analytics).</li>
+      <li><strong>cookie-consent</strong> — Stores your consent choice. Duration: permanent (localStorage). Type: Necessary.</li>
+    </ul>
+
+    <h3>Essential cookies</h3>
+    <p><strong>cookie-consent</strong> (localStorage) is necessary to remember your choice. It does not transmit data to third parties.</p>
+
+    <h3>Analytics cookies</h3>
+    <p>Google Analytics cookies are only activated if you accept the cookie banner. If you decline, no analytics cookies are created.</p>
+
+    <h3>How to manage cookies</h3>
+    <p>You can delete cookies at any time in your browser settings. To withdraw consent, clear site data and the banner will appear again.</p>
+  `
+};
+
+function openPrivacy(type) {
+  const modal = document.getElementById('privacyModal');
+  modal.querySelector('h2').textContent = type === 'cookies' ? POLICY.cookiesTitle : POLICY.privacyTitle;
+  modal.querySelector('.priv-body').innerHTML = type === 'cookies' ? POLICY.cookiesHtml : POLICY.privacyHtml;
+  document.getElementById('privacyOverlay').classList.add('open');
+}
+function closePrivacy() {
+  document.getElementById('privacyOverlay').classList.remove('open');
+}
+</script>
+
+<!-- Cookie banner -->
+<div id="cookieBanner" class="cookie-banner">
+  <span>We use cookies for traffic analysis.</span>
+  <a href="#" onclick="event.preventDefault();openPrivacy('cookies')" style="color:var(--accent);text-decoration:none;">Learn more</a>
+  <button onclick="acceptCookies()" class="cookie-accept">Accept</button>
+  <button onclick="rejectCookies()" class="cookie-reject">Decline</button>
+</div>
+<script>
+try {
+  var c = localStorage.getItem('cookie-consent');
+  if (!c) document.getElementById('cookieBanner').style.display = 'flex';
+  else if (c === 'accepted') initGtag();
+} catch(e) { document.getElementById('cookieBanner').style.display = 'flex'; }
+</script>
+
+<!-- Privacy/Cookie policy modal -->
+<div class="privacy-overlay" id="privacyOverlay" onclick="if(event.target===this)closePrivacy()">
+  <div class="privacy-modal" id="privacyModal">
+    <button class="close-priv" onclick="closePrivacy()" aria-label="Close">&times;</button>
+    <h2></h2>
+    <div class="priv-body"></div>
+  </div>
+</div>
+
+</body>
+</html>

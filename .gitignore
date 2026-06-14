@@ -1,0 +1,17 @@
+# Rust / Tauri build output
+/src-tauri/target/
+/src-tauri/gen/schemas/
+
+# MSIX packaging artifacts
+/dist/
+*.msix
+*.msixbundle
+*.appx
+
+# Code-signing certificates (never commit private keys)
+*.pfx
+*.cer
+
+# OS cruft
+.DS_Store
+Thumbs.db
