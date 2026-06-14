@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    visual_assets_generator_lib::run()
+    store_asset_studio_lib::run()
 }

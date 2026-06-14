@@ -1,4 +1,4 @@
-# 🖼️ Visual Assets Generator
+# 🖼️ Store Asset Studio
 
 Generate every platform's app icons and store assets from a single source image - Microsoft Store, Windows `.ico`, macOS, Android, iOS, Chrome Extension, Favicon, Social/OG and Flatpak.
 

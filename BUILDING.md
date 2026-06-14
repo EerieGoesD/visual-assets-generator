@@ -1,4 +1,4 @@
-# Building Visual Assets Generator
+# Building Store Asset Studio
 
 This is a [Tauri 2](https://tauri.app) desktop app. The UI is a static, dependency-free
 frontend (`src/`); icon generation runs entirely in the webview via the Canvas API. The
@@ -27,7 +27,7 @@ There is no JS build step or dev server - the frontend is static and served dire
 cargo tauri build --no-bundle
 ```
 
-Output: `src-tauri/target/release/visual-assets-generator.exe` (a self-contained exe;
+Output: `src-tauri/target/release/store-asset-studio.exe` (a self-contained exe;
 Tauri statically links the WebView2 loader). Drop `--no-bundle` to also produce the NSIS
 installer (Windows) or `.app` + `.dmg` (macOS).
 
@@ -46,11 +46,11 @@ winapp cert generate --if-exists skip
 
 # 3. Stage the exe and pack
 if (-not (Test-Path dist)) { New-Item -ItemType Directory dist | Out-Null }
-Copy-Item src-tauri\target\release\visual-assets-generator.exe dist\ -Force
+Copy-Item src-tauri\target\release\store-asset-studio.exe dist\ -Force
 winapp pack .\dist --cert .\devcert.pfx
 ```
 
-This produces `Visual Assets Generator_1.0.0.0_x64.msix` in the repo root.
+This produces `Store Asset Studio_1.0.0.0_x64.msix` in the repo root.
 
 Local install/test of the self-signed package:
 

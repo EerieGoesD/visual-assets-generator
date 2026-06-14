@@ -1,5 +1,5 @@
 [package]
-name = "visual-assets-generator"
+name = "store-asset-studio"
 version = "1.0.0"
 description = "Generate every platform app icon and store asset from a single image"
 authors = ["EERIE"]
@@ -7,7 +7,7 @@ edition = "2021"
 
 [lib]
 # The `_lib` suffix avoids a name clash with the binary on Windows.
-name = "visual_assets_generator_lib"
+name = "store_asset_studio_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
