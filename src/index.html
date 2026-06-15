@@ -749,12 +749,19 @@
         </div>
       </div>
 
+      <div class="options-row" style="margin-bottom:10px;">
+        <div class="toggle-option on" id="toggleZip" onclick="toggleZip()">
+          <div class="toggle-box">✓</div>
+          <div class="toggle-label">Save as ZIP (off = plain folder)</div>
+        </div>
+      </div>
+
       <div class="summary-bar" id="summaryBar">
         Select platforms and assets to see a summary.
       </div>
 
       <button id="generateBtn" onclick="generate()" disabled>
-        Generate &amp; Save ZIP
+        Generate &amp; Save
         <div class="btn-spinner"></div>
       </button>
     </div>
@@ -1052,6 +1059,7 @@ let sourceFileName = '';
 let fitMode = 'contain';  // 'contain' or 'cover'
 let flutterNaming = false;
 let androidSafePaddingEnabled = false;
+let zipEnabled = true;    // true = save one ZIP, false = save a plain folder
 
 const ANDROID_ADAPTIVE_FOREGROUND_SCALE = 0.565;
 const ANDROID_ADAPTIVE_BACKGROUND_COLOR = '#FFFFFF';
@@ -1301,6 +1309,11 @@ function toggleFlutter() {
   rebuildAssetPanel();
 }
 
+function toggleZip() {
+  zipEnabled = !zipEnabled;
+  setToggleChecked('toggleZip', zipEnabled);
+}
+
 function toggleAndroidSafePadding() {
   androidSafePaddingEnabled = !androidSafePaddingEnabled;
   setToggleChecked('toggleAndroidSafePadding', androidSafePaddingEnabled);
@@ -1453,13 +1466,13 @@ function androidAdaptiveBackgroundXml() {
 `;
 }
 
-async function addAndroidAdaptiveIconFiles(zip, src) {
+async function addAndroidAdaptiveIconFiles(outputs, src) {
   let added = 0;
 
-  zip.file('Android/mipmap-anydpi-v26/ic_launcher.xml', androidAdaptiveIconXml());
-  zip.file('Android/mipmap-anydpi-v26/ic_launcher_round.xml', androidAdaptiveIconXml());
-  zip.file('Android/drawable/ic_launcher_background.xml', androidAdaptiveBackgroundXml());
-  zip.file('Android/README-adaptive-icon.txt', [
+  outputs.push({ path: 'Android/mipmap-anydpi-v26/ic_launcher.xml', data: androidAdaptiveIconXml() });
+  outputs.push({ path: 'Android/mipmap-anydpi-v26/ic_launcher_round.xml', data: androidAdaptiveIconXml() });
+  outputs.push({ path: 'Android/drawable/ic_launcher_background.xml', data: androidAdaptiveBackgroundXml() });
+  outputs.push({ path: 'Android/README-adaptive-icon.txt', data: [
     'Android adaptive launcher icon files generated with safe padding.',
     '',
     'Copy these folders into android/app/src/main/res:',
@@ -1472,14 +1485,14 @@ async function addAndroidAdaptiveIconFiles(zip, src) {
     'android:roundIcon="@mipmap/ic_launcher_round"',
     '',
     'The foreground image is centered at 56.5% of the adaptive icon canvas with a white background, which prevents launcher masks from cropping the logo.',
-  ].join('\n'));
+  ].join('\n') });
   added += 4;
 
   for (const spec of ANDROID_ADAPTIVE_FOREGROUNDS) {
     const canvas = renderPaddedContain(src, spec.w, spec.h, ANDROID_ADAPTIVE_FOREGROUND_SCALE);
     const blob = await canvasToBlob(canvas);
     const arrayBuffer = await blob.arrayBuffer();
-    zip.file(spec.file, arrayBuffer);
+    outputs.push({ path: spec.file, data: arrayBuffer });
     added++;
   }
 
@@ -1788,6 +1801,12 @@ function base64FromArrayBuffer(buf) {
   return btoa(binary);
 }
 
+// Base64-encode an output entry's data (ArrayBuffer, Uint8Array, or text string)
+function dataToBase64(data) {
+  if (typeof data === 'string') data = new TextEncoder().encode(data);
+  return base64FromArrayBuffer(data);
+}
+
 // Open a URL in the system browser via the Tauri opener plugin
 function openExternal(e, url) {
   if (e) e.preventDefault();
@@ -1974,7 +1993,7 @@ async function generate() {
 
   log('Starting asset generation...', 'info');
 
-  const zip = new JSZip();
+  const outputs = [];
   let created = 0, errors = 0;
 
   // Build a lookup: key → asset spec
@@ -2004,7 +2023,7 @@ async function generate() {
       if (spec.ico) {
         // Build multi-resolution ICO file
         const icoBuffer = await buildIco(sourceImage);
-        zip.file(outFile, icoBuffer);
+        outputs.push({ path: outFile, data: icoBuffer });
       } else if (spec.badge) {
         // Badge logos: encode PNG manually to bypass canvas.toBlob()
         // alpha-premultiplication artifacts that break WACK validation
@@ -2012,7 +2031,7 @@ async function generate() {
         const imgData = canvas.getContext('2d').getImageData(0, 0, spec.w, spec.h);
         forceWhiteRGBA(imgData); // final guarantee
         const pngBuffer = buildPNGFromRGBA(spec.w, spec.h, imgData.data);
-        zip.file(outFile, pngBuffer);
+        outputs.push({ path: outFile, data: pngBuffer });
       } else {
         let canvas;
         if (fitMode === 'cover') {
@@ -2023,7 +2042,7 @@ async function generate() {
 
         const blob = await canvasToBlob(canvas);
         const arrayBuffer = await blob.arrayBuffer();
-        zip.file(outFile, arrayBuffer);
+        outputs.push({ path: outFile, data: arrayBuffer });
       }
 
       log(`OK  ${outFile}  (${spec.w}×${spec.h})`, 'ok');
@@ -2040,7 +2059,7 @@ async function generate() {
   if (androidSafePaddingEnabled && hasAndroidSelection) {
     log('Adding Android adaptive icon safe-padding files...', 'info');
     try {
-      const added = await addAndroidAdaptiveIconFiles(zip, sourceImage);
+      const added = await addAndroidAdaptiveIconFiles(outputs, sourceImage);
       created += added;
       log(`OK  Android adaptive icon safe-padding files (${added} files)`, 'ok');
     } catch (err) {
@@ -2051,25 +2070,43 @@ async function generate() {
 
   log(`Done. ${created} created, ${errors} errors.`, 'info');
 
-  // Generate zip
-  log('Compressing ZIP...', 'info');
-  const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
-
-  // Save via the native save dialog (Tauri)
+  // Save: one ZIP, or a plain folder of files (toggle)
   try {
-    const path = await window.__TAURI__.dialog.save({
-      defaultPath: 'visual-assets.zip',
-      filters: [{ name: 'ZIP archive', extensions: ['zip'] }]
-    });
-    if (path) {
-      const buf = await zipBlob.arrayBuffer();
-      await window.__TAURI__.core.invoke('write_file', { path, data: base64FromArrayBuffer(buf) });
-      log('Saved: ' + path, 'ok');
+    if (zipEnabled) {
+      log('Compressing ZIP...', 'info');
+      const zip = new JSZip();
+      for (const o of outputs) zip.file(o.path, o.data);
+      const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
+      const path = await window.__TAURI__.dialog.save({
+        defaultPath: 'visual-assets.zip',
+        filters: [{ name: 'ZIP archive', extensions: ['zip'] }]
+      });
+      if (path) {
+        const buf = await zipBlob.arrayBuffer();
+        await window.__TAURI__.core.invoke('write_file', { path, data: base64FromArrayBuffer(buf) });
+        log('Saved ZIP: ' + path, 'ok');
+      } else {
+        log('Save cancelled.', 'skip');
+      }
     } else {
-      log('Save cancelled.', 'skip');
+      const dir = await window.__TAURI__.dialog.open({
+        directory: true, multiple: false, title: 'Choose a folder to save the assets'
+      });
+      if (dir) {
+        const base = String(dir).replace(/[\\/]+$/, '');
+        log('Writing files to folder...', 'info');
+        let saved = 0;
+        for (const o of outputs) {
+          await window.__TAURI__.core.invoke('write_file', { path: base + '/' + o.path, data: dataToBase64(o.data) });
+          saved++;
+        }
+        log(`Saved ${saved} files to ${base}`, 'ok');
+      } else {
+        log('Save cancelled.', 'skip');
+      }
     }
   } catch (err) {
-    log('ERR saving ZIP: ' + (err && err.message ? err.message : err), 'err');
+    log('ERR saving: ' + (err && err.message ? err.message : err), 'err');
   }
 
   btn.classList.remove('loading');

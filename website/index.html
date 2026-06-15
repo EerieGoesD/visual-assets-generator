@@ -5,68 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <!-- Primary SEO -->
-<title>Visual Assets Generator — App Icons for Windows, macOS, Android, iOS & Chrome</title>
-<meta name="description" content="Free browser-based tool to generate all platform app icons and visual assets from a single image. Supports Microsoft Store, Windows .ico, macOS, Android Play Store, iOS App Store, Chrome Extension, and Flutter naming. No install, no signup." />
-<meta name="keywords" content="app icon generator, visual assets generator, windows store assets, windows ico, macos icons, android icons, ios app icons, chrome extension icons, microsoft store wack, badge logo generator, free icon resizer, flutter icons" />
+<title>Store Asset Studio - App Icons & Store Assets from One Image</title>
+<meta name="description" content="Free browser tool to generate every platform's app icons and store assets from a single image: Microsoft Store, Windows .ico, macOS, Android, iOS, Chrome Extension, Favicon, Social/OG and Flatpak. No install, no signup." />
+<meta name="keywords" content="app icon generator, store assets, windows store assets, windows ico, macos icons, android icons, ios app icons, chrome extension icons, favicon generator, flutter icons" />
 <meta name="author" content="EERIE" />
-<meta name="google-site-verification" content="013d1db42c419216" />
-<link rel="canonical" href="https://eeriegoesd.com/visual-assets-generator-website/" />
 <link rel="icon" type="image/png" href="favicon.png" />
 <link rel="apple-touch-icon" href="favicon.png" />
 
-<!-- Open Graph (Facebook, LinkedIn, Discord) -->
+<!-- Open Graph / Twitter (add canonical, og:url and og:image once the site is hosted) -->
 <meta property="og:type" content="website" />
-<meta property="og:url" content="https://eeriegoesd.com/visual-assets-generator-website/" />
-<meta property="og:title" content="Visual Assets Generator — App Icons for Windows, macOS, Android, iOS & Chrome" />
-<meta property="og:description" content="Upload one image, download all your app icons and store assets as a ZIP. Supports Microsoft Store, Windows .ico, macOS, Android, iOS, Chrome Extension, and Flutter naming. Free, runs entirely in the browser." />
-<meta property="og:image" content="https://eeriegoesd.com/visual-assets-generator-website/og-preview.png" />
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="630" />
-<meta property="og:site_name" content="Visual Assets Generator" />
-
-<!-- Twitter / X Card -->
+<meta property="og:title" content="Store Asset Studio - App Icons & Store Assets from One Image" />
+<meta property="og:description" content="Upload one image, download every app icon and store asset. Free, runs entirely in your browser." />
+<meta property="og:site_name" content="Store Asset Studio" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:url" content="https://eeriegoesd.com/visual-assets-generator-website/" />
-<meta name="twitter:title" content="Visual Assets Generator — App Icons for Windows, macOS, Android, iOS & Chrome" />
-<meta name="twitter:description" content="Upload one image, download all your app icons and store assets as a ZIP. Free, runs entirely in the browser." />
-<meta name="twitter:image" content="https://eeriegoesd.com/visual-assets-generator-website/og-preview.png" />
+<meta name="twitter:title" content="Store Asset Studio - App Icons & Store Assets from One Image" />
+<meta name="twitter:description" content="Upload one image, download every app icon and store asset. Free, runs entirely in your browser." />
 
-<!-- Structured Data (JSON-LD) -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  "name": "Visual Assets Generator",
-  "url": "https://eeriegoesd.com/visual-assets-generator-website/",
-  "description": "Free browser-based tool to generate all platform app icons and visual assets from a single image. Supports Microsoft Store, Windows .ico, macOS, Android Play Store, iOS App Store, Chrome Extension, and Flutter naming.",
-  "applicationCategory": "DeveloperApplication",
-  "operatingSystem": "Any",
-  "offers": {
-    "@type": "Offer",
-    "price": "0",
-    "priceCurrency": "USD"
-  },
-  "author": {
-    "@type": "Person",
-    "name": "EERIE",
-    "url": "https://eeriegoesd.com"
-  },
-  "featureList": [
-    "Microsoft Store visual assets (WACK compliant)",
-    "Windows .ico desktop app icon",
-    "macOS app icons",
-    "Android Play Store icons",
-    "iOS App Store icons",
-    "Chrome Extension icons and promo tiles",
-    "Flutter naming convention support",
-    "ZIP download",
-    "No install or signup required",
-    "Favicon generation",
-    "Social / Open Graph image generation",
-    "Flatpak (Flathub) icons"  ]
-}
-</script>
-<!-- Google Analytics — loaded only after cookie consent -->
+<!-- Google Analytics - loaded only after cookie consent -->
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -96,7 +51,7 @@
     --muted: #6b6b88;
     --success: #3de68e;
     --mono: 'JetBrains Mono', monospace;
-    --sans: 'Syne', sans-serif;
+    --sans: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -105,8 +60,10 @@
     background: var(--bg);
     color: var(--text);
     font-family: var(--sans);
-    min-height: 100vh;
-    overflow-x: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 
   /* Noise texture overlay */
@@ -121,81 +78,117 @@
   }
 
   header {
+    flex: 0 0 auto;
     position: relative;
-    padding: 48px 24px 36px;
+    z-index: 10;
+    padding: 14px 24px;
     border-bottom: 1px solid var(--border);
-    background: linear-gradient(180deg, #0f0f1a 0%, var(--bg) 100%);
-    overflow: hidden;
-  }
-
-  header::after {
-    content: '';
-    position: absolute;
-    top: -60px; left: -40px;
-    width: 400px; height: 400px;
-    background: radial-gradient(circle, rgba(255,107,43,0.08) 0%, transparent 70%);
-    pointer-events: none;
+    background: rgba(17,17,24,0.92);
+    backdrop-filter: blur(8px);
   }
 
   .header-inner {
-    max-width: 860px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 13px;
   }
 
-  .tag {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--accent);
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    margin-bottom: 12px;
-    opacity: 0.9;
+  .app-logo {
+    width: 38px; height: 38px;
+    border-radius: 9px;
+    flex-shrink: 0;
   }
 
   h1 {
-    font-size: clamp(28px, 5vw, 44px);
+    font-size: 19px;
     font-weight: 800;
-    line-height: 1.1;
+    line-height: 1.15;
     color: #fff;
-    margin-bottom: 12px;
+    letter-spacing: 0.2px;
   }
-
-  h1 span { color: var(--accent); }
 
   .subtitle {
     color: var(--muted);
-    font-size: 14px;
+    font-size: 12px;
     font-family: var(--mono);
-    line-height: 1.7;
+    line-height: 1.4;
+    margin-top: 2px;
   }
 
   main {
-    max-width: 860px;
-    margin: 0 auto;
-    padding: 40px 24px 80px;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    padding: 16px 22px;
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    grid-template-rows: 1fr;
+    align-items: stretch;
+    gap: 18px;
+    overflow: hidden;
+  }
+
+  /* Two-pane app layout */
+  .pane {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .block { display: flex; flex-direction: column; min-height: 0; }
+  .block-grow { flex: 1 1 0; min-height: 0; }
+
+  .block-title {
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .app-footer {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    white-space: nowrap;
+    padding: 9px 16px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    color: var(--muted);
     position: relative;
     z-index: 1;
   }
 
   .step {
-    margin-bottom: 40px;
+    margin-bottom: 16px;
   }
 
   .step-label {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
+    gap: 9px;
+    margin-bottom: 10px;
   }
 
   .step-num {
-    width: 28px; height: 28px;
+    width: 22px; height: 22px;
     background: var(--accent);
     color: #fff;
     font-weight: 700;
-    font-size: 12px;
+    font-size: 11px;
     border-radius: 4px;
     display: flex; align-items: center; justify-content: center;
     font-family: var(--mono);
@@ -203,7 +196,7 @@
   }
 
   .step-title {
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 700;
     color: #fff;
     letter-spacing: 1px;
@@ -214,8 +207,11 @@
   #dropzone {
     border: 2px dashed var(--border);
     border-radius: 10px;
-    padding: 48px 24px;
-    text-align: center;
+    padding: 11px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
     cursor: pointer;
     transition: all 0.2s;
     background: var(--surface);
@@ -231,34 +227,40 @@
   #dropzone.has-image {
     border-style: solid;
     border-color: var(--accent);
-    padding: 20px;
+    padding: 12px 16px;
   }
 
   .dropzone-icon {
-    font-size: 36px;
-    margin-bottom: 12px;
-    display: block;
+    font-size: 20px;
+    line-height: 1;
+    flex-shrink: 0;
   }
 
   .dropzone-text {
     color: var(--muted);
-    font-size: 14px;
+    font-size: 12.5px;
     font-family: var(--mono);
-    line-height: 1.6;
+    line-height: 1.3;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 
   .dropzone-text strong { color: var(--accent); cursor: pointer; }
+  .dz-hint { color: var(--muted); opacity: 0.6; font-size: 11px; }
 
   #fileInput { display: none; }
 
   #imagePreview {
     display: none;
-    gap: 20px;
+    gap: 14px;
     align-items: center;
   }
 
   #imagePreview img {
-    width: 80px; height: 80px;
+    width: 52px; height: 52px;
     object-fit: contain;
     border-radius: 8px;
     background: repeating-conic-gradient(#1a1a24 0% 25%, #111118 0% 50%) 0 0/12px 12px;
@@ -300,9 +302,12 @@
   /* Platform grid */
   .platforms-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 8px;
+    flex: 0 0 auto;
   }
+
+  .platform-count { display: none; }
 
   .platform-card {
     background: var(--surface);
@@ -325,22 +330,23 @@
   }
 
   .platform-header {
-    padding: 16px 16px 12px;
+    padding: 10px 11px 6px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
   }
 
   .platform-icon {
-    font-size: 24px;
+    font-size: 18px;
     flex-shrink: 0;
   }
 
   .platform-name {
     font-weight: 700;
-    font-size: 14px;
+    font-size: 12.5px;
     color: #fff;
     flex: 1;
+    line-height: 1.2;
   }
 
   .platform-check {
@@ -360,29 +366,32 @@
   }
 
   .platform-count {
-    padding: 0 16px 14px;
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
+    display: none;
   }
 
   /* Asset panel */
   .asset-panel {
     display: none;
-    margin-top: 20px;
+    margin-top: 12px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 10px;
     overflow: hidden;
   }
 
-  .asset-panel.visible { display: block; }
+  .asset-panel.visible {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+  }
 
   .asset-panel-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 18px;
+    padding: 9px 14px;
     border-bottom: 1px solid var(--border);
     background: var(--surface2);
   }
@@ -422,7 +431,7 @@
   .asset-section:last-child { border-bottom: none; }
 
   .asset-section-title {
-    padding: 10px 18px;
+    padding: 7px 14px;
     font-family: var(--mono);
     font-size: 10px;
     color: var(--accent);
@@ -432,10 +441,10 @@
   }
 
   .asset-list {
-    padding: 10px 18px;
+    padding: 8px 14px;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 4px;
+    grid-template-columns: repeat(auto-fill, minmax(205px, 1fr));
+    gap: 3px;
   }
 
   .asset-item {
@@ -482,7 +491,7 @@
   /* Options */
   .options-row {
     display: flex;
-    gap: 20px;
+    gap: 14px 24px;
     flex-wrap: wrap;
     align-items: center;
   }
@@ -528,12 +537,12 @@
   /* Generate button */
   #generateBtn {
     width: 100%;
-    padding: 18px;
+    padding: 13px;
     background: var(--accent);
     color: #fff;
     font-family: var(--sans);
     font-weight: 800;
-    font-size: 16px;
+    font-size: 15px;
     letter-spacing: 1px;
     text-transform: uppercase;
     border: none;
@@ -542,7 +551,7 @@
     transition: all 0.2s;
     position: relative;
     overflow: hidden;
-    margin-top: 8px;
+    margin-top: 4px;
   }
 
   #generateBtn:hover:not(:disabled) {
@@ -576,15 +585,17 @@
 
   /* Log */
   #logPanel {
-    display: none;
-    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    min-height: 0;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 10px;
     overflow: hidden;
   }
 
-  #logPanel.visible { display: block; }
+  #logPanel.visible { display: flex; }
 
   .log-header {
     padding: 10px 16px;
@@ -603,7 +614,8 @@
     font-size: 11px;
     line-height: 1.8;
     color: var(--muted);
-    max-height: 220px;
+    flex: 1 1 0;
+    min-height: 0;
     overflow-y: auto;
   }
 
@@ -616,23 +628,26 @@
   .divider {
     height: 1px;
     background: var(--border);
-    margin: 32px 0;
+    margin: 14px 0;
   }
 
   /* Selection summary */
   .summary-bar {
+    flex: 0 0 auto;
+    height: 74px;
     background: var(--surface2);
     border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 12px 16px;
+    padding: 9px 14px;
     font-family: var(--mono);
     font-size: 12px;
+    line-height: 1.5;
     color: var(--muted);
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
   }
 
   .summary-bar .count {
@@ -689,166 +704,124 @@
 
 <header>
   <div class="header-inner">
-    <p class="tag">// Visual Assets Generator v2.0</p>
-    <h1>App Icon &amp;<br><span>Asset Exporter</span></h1>
-    <p class="subtitle">
-      Upload one source image → generate all platform assets → download ZIP.<br>
-      Supports Windows Store · macOS · Android · iOS · Chrome Extension.
-    <p style="margin-top:14px; font-family:var(--mono); font-size:11px; color:var(--muted);">
-      🖥️ 8 platforms · 🔒 Runs entirely in your browser · ☕ Free forever
-    </p>
-    </p>
+    <img class="app-logo" src="favicon.png" alt="" />
+    <div>
+      <h1>Store Asset Studio</h1>
+      <p class="subtitle">Generate every platform's app icons and store assets from one image.</p>
+    </div>
   </div>
 </header>
 
 <main>
 
-  <!-- STEP 1: Image -->
-  <div class="step">
-    <div class="step-label">
-      <div class="step-num">01</div>
-      <div class="step-title">Source Image</div>
-    </div>
+  <!-- LEFT: source image + platforms -->
+  <section class="pane pane-left">
 
-    <div id="dropzone">
-      <span class="dropzone-icon">🖼️</span>
-      <p class="dropzone-text">
-        Drag & drop your icon here<br>
-        or <strong onclick="document.getElementById('fileInput').click()">browse to upload</strong>
-      </p>
-      <p class="dropzone-text" style="margin-top:8px;font-size:11px;">PNG, JPG, JPEG • Recommended: 1024×1024 or larger</p>
-      <input type="file" id="fileInput" accept=".png,.jpg,.jpeg" />
+    <div class="block">
+      <div class="block-title">Source Image</div>
+      <div id="dropzone">
+        <span class="dropzone-icon">🖼️</span>
+        <p class="dropzone-text">
+          <span>Drag &amp; drop an image, or <strong onclick="document.getElementById('fileInput').click()">browse</strong></span>
+          <span class="dz-hint">PNG / JPG · 1024×1024+ recommended</span>
+        </p>
+        <input type="file" id="fileInput" accept=".png,.jpg,.jpeg" />
 
-      <div id="imagePreview">
-        <img id="previewImg" src="" alt="preview" />
-        <div class="preview-info">
-          <div class="preview-name" id="previewName">—</div>
-          <div class="preview-dims" id="previewDims">—</div>
-          <button class="btn-change" onclick="document.getElementById('fileInput').click()">Change image</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- STEP 2: Platforms -->
-  <div class="step">
-    <div class="step-label">
-      <div class="step-num">02</div>
-      <div class="step-title">Target Platforms</div>
-    </div>
-
-    <div class="platforms-grid" id="platformsGrid"></div>
-
-    <div class="asset-panel" id="assetPanel"></div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- STEP 3: Options & Generate -->
-  <div class="step">
-    <div class="step-label">
-      <div class="step-num">03</div>
-      <div class="step-title">Options &amp; Export</div>
-    </div>
-
-    <div class="options-row" style="margin-bottom:24px;">
-      <div class="toggle-option on" id="toggleContain" onclick="toggleOption('toggleContain','contain')">
-        <div class="toggle-box">✓</div>
-        <div class="toggle-label">Letterbox (contain)</div>
-      </div>
-      <div class="toggle-option" id="toggleCover" onclick="toggleOption('toggleCover','cover')">
-        <div class="toggle-box"></div>
-        <div class="toggle-label">Crop (cover)</div>
-      </div>
-    </div>
-
-    <div class="options-row" style="margin-bottom:24px;">
-      <div class="toggle-option" id="toggleFlutter" onclick="toggleFlutter()">
-        <div class="toggle-box"></div>
-        <div class="toggle-label">Flutter naming convention</div>
-      </div>
-      <div class="toggle-option" id="toggleAndroidSafePadding" onclick="toggleAndroidSafePadding()">
-        <div class="toggle-box"></div>
-        <div>
-          <div class="toggle-label">Add padding to Android app icons</div>
-          <div class="option-help">Creates adaptive icon foreground/background files to prevent Pixel and Android launcher cropping.</div>
+        <div id="imagePreview">
+          <img id="previewImg" src="" alt="preview" />
+          <div class="preview-info">
+            <div class="preview-name" id="previewName">-</div>
+            <div class="preview-dims" id="previewDims">-</div>
+            <button class="btn-change" onclick="document.getElementById('fileInput').click()">Change image</button>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="summary-bar" id="summaryBar">
-      Select platforms and assets above to see a summary.
+    <div class="block block-grow">
+      <div class="block-title">Platforms</div>
+      <div class="platforms-grid" id="platformsGrid"></div>
+      <div class="asset-panel" id="assetPanel"></div>
     </div>
 
-    <button id="generateBtn" onclick="generate()" disabled>
-      Generate &amp; Download ZIP
-      <div class="btn-spinner"></div>
-    </button>
+  </section>
 
-<div style="display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:16px;font-family:var(--mono);font-size:11px;color:var(--muted);">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <span>Made by</span>
-      <a href="https://eeriegoesd.com" target="_blank" rel="noreferrer" style="color:var(--accent);text-decoration:none;font-weight:700;">EERIE</a>
-      <span style="color:var(--border)">|</span>
-      <a href="https://buymeacoffee.com/eeriegoesd" target="_blank" rel="noreferrer" style="color:var(--accent);text-decoration:none;">Buy Me a Coffee</a>
+  <!-- RIGHT: options + output log -->
+  <section class="pane pane-right">
+
+    <div class="block">
+      <div class="block-title">Options</div>
+
+      <div class="options-row" style="margin-bottom:10px;">
+        <div class="toggle-option on" id="toggleContain" onclick="toggleOption('toggleContain','contain')">
+          <div class="toggle-box">✓</div>
+          <div class="toggle-label">Letterbox (contain)</div>
+        </div>
+        <div class="toggle-option" id="toggleCover" onclick="toggleOption('toggleCover','cover')">
+          <div class="toggle-box"></div>
+          <div class="toggle-label">Crop (cover)</div>
+        </div>
+      </div>
+
+      <div class="options-row" style="margin-bottom:10px;">
+        <div class="toggle-option" id="toggleFlutter" onclick="toggleFlutter()">
+          <div class="toggle-box"></div>
+          <div class="toggle-label">Flutter naming convention</div>
+        </div>
+        <div class="toggle-option" id="toggleAndroidSafePadding" onclick="toggleAndroidSafePadding()">
+          <div class="toggle-box"></div>
+          <div>
+            <div class="toggle-label">Add padding to Android app icons</div>
+            <div class="option-help">Creates adaptive icon foreground/background files to prevent Pixel and Android launcher cropping.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="options-row" style="margin-bottom:10px;">
+        <div class="toggle-option on" id="toggleZip" onclick="toggleZip()">
+          <div class="toggle-box">✓</div>
+          <div class="toggle-label">Save as ZIP (off = plain folder)</div>
+        </div>
+      </div>
+
+      <div class="summary-bar" id="summaryBar">
+        Select platforms and assets to see a summary.
+      </div>
+
+      <button id="generateBtn" onclick="generate()" disabled>
+        Generate &amp; Save
+        <div class="btn-spinner"></div>
+      </button>
     </div>
-    <div style="display:flex;align-items:center;gap:10px;">
-      <a href="#" onclick="event.preventDefault();openPrivacy('privacy')" style="color:var(--muted);text-decoration:none;">Privacy Policy</a>
-      <span style="color:var(--border)">|</span>
-      <a href="#" onclick="event.preventDefault();openPrivacy('cookies')" style="color:var(--muted);text-decoration:none;">Cookie Policy</a>
-      <span style="color:var(--border)">|</span>
-      <a href="https://github.com/EerieGoesD/visual-assets-generator-website/discussions" target="_blank" rel="noreferrer" style="color:var(--muted);text-decoration:none;">Feedback</a>
-      <span style="color:var(--border)">|</span>
-      <a href="https://github.com/EerieGoesD/visual-assets-generator-website/issues" target="_blank" rel="noreferrer" style="color:var(--muted);text-decoration:none;">Report bug</a>
-    </div>
+
+    <div class="block block-grow">
+      <div class="block-title">Output Log</div>
+      <div id="logPanel">
+        <div id="logOutput"></div>
+      </div>
     </div>
 
-<div class="divider"></div>
-    <h2 style="font-size:18px; font-weight:800; color:#fff; margin:32px 0 20px;">Frequently Asked Questions</h2>
-
-    <details style="margin-bottom:12px; border:1px solid var(--border); border-radius:8px; background:var(--surface);">
-      <summary style="padding:14px 18px; cursor:pointer; font-weight:700; font-size:13px; color:var(--text);">What platforms are supported?</summary>
-      <p style="padding:0 18px 14px; font-size:13px; color:var(--muted); line-height:1.7; font-family:var(--mono);">Microsoft Store (WACK-compliant), Windows desktop .ico, macOS, Android Play Store, iOS App Store, Chrome Extension, Favicon, Social/OG images, and Flatpak. Each platform includes all required icon sizes and store listing graphics.</p>
-    </details>
-
-    <details style="margin-bottom:12px; border:1px solid var(--border); border-radius:8px; background:var(--surface);">
-      <summary style="padding:14px 18px; cursor:pointer; font-weight:700; font-size:13px; color:var(--text);">Is my image uploaded to a server?</summary>
-      <p style="padding:0 18px 14px; font-size:13px; color:var(--muted); line-height:1.7; font-family:var(--mono);">No. All image processing happens locally in your browser using the Canvas API. Your image never leaves your device — nothing is uploaded anywhere.</p>
-    </details>
-
-    <details style="margin-bottom:12px; border:1px solid var(--border); border-radius:8px; background:var(--surface);">
-      <summary style="padding:14px 18px; cursor:pointer; font-weight:700; font-size:13px; color:var(--text);">What image size should I use?</summary>
-      <p style="padding:0 18px 14px; font-size:13px; color:var(--muted); line-height:1.7; font-family:var(--mono);">At least 1024×1024 pixels for best results, since some assets (like iOS App Store icons) require that resolution. Larger images will be scaled down without quality loss. PNG is preferred for transparency support.</p>
-    </details>
-
-    <details style="margin-bottom:12px; border:1px solid var(--border); border-radius:8px; background:var(--surface);">
-      <summary style="padding:14px 18px; cursor:pointer; font-weight:700; font-size:13px; color:var(--text);">What's the difference between Letterbox and Crop?</summary>
-      <p style="padding:0 18px 14px; font-size:13px; color:var(--muted); line-height:1.7; font-family:var(--mono);">Letterbox (contain) fits your entire image inside the target dimensions, adding transparent padding if the aspect ratio doesn't match. Crop (cover) fills the entire target area, cutting off edges if needed. For square icons, both produce the same result.</p>
-    </details>
-
-    <details style="margin-bottom:12px; border:1px solid var(--border); border-radius:8px; background:var(--surface);">
-      <summary style="padding:14px 18px; cursor:pointer; font-weight:700; font-size:13px; color:var(--text);">How do Windows Store badge logos work?</summary>
-      <p style="padding:0 18px 14px; font-size:13px; color:var(--muted); line-height:1.7; font-family:var(--mono);">Badge logos must pass Microsoft's WACK validation: all visible pixels must be pure white on a transparent background. This tool automatically detects and removes the background using dominant color detection and Otsu thresholding, then converts the foreground to white.</p>
-    </details>
-
-    <details style="margin-bottom:12px; border:1px solid var(--border); border-radius:8px; background:var(--surface);">
-      <summary style="padding:14px 18px; cursor:pointer; font-weight:700; font-size:13px; color:var(--text);">What is the "Flutter naming convention" option?</summary>
-      <p style="padding:0 18px 14px; font-size:13px; color:var(--muted); line-height:1.7; font-family:var(--mono);">When enabled, iOS and macOS icons are exported with the filenames that Flutter expects (e.g. Icon-App-60x60@2x.png instead of iPhone-120.png). This lets you drop the generated files directly into your Flutter project's asset directories without renaming.</p>
-    </details>
-
-    <details style="margin-bottom:12px; border:1px solid var(--border); border-radius:8px; background:var(--surface);">
-      <summary style="padding:14px 18px; cursor:pointer; font-weight:700; font-size:13px; color:var(--text);">What about macOS and Windows .ico?</summary>
-      <p style="padding:0 18px 14px; font-size:13px; color:var(--muted); line-height:1.7; font-family:var(--mono);">The macOS platform generates all 7 standard app icon sizes (16px to 1024px). The Windows platform includes a Desktop App Icon (.ico) section that generates a multi-resolution .ico file containing 16, 32, 48, 64, 128, and 256px sizes — ready for use as a Windows desktop app icon (e.g. Flutter's Windows runner).</p>
-    </details>
-
-    <div id="logPanel">
-      <div class="log-header">// Output Log</div>
-      <div id="logOutput"></div>
-    </div>
+  </section>
 
 </main>
+
+<footer class="app-footer">
+  <span>Made by <a href="#" onclick="openExternal(event,'https://eeriegoesd.com')" style="color:var(--accent);text-decoration:none;font-weight:700;">EERIE</a></span>
+  <span style="color:var(--border)">|</span>
+  <a href="#" onclick="openExternal(event,'https://buymeacoffee.com/eeriegoesd')" style="color:#ffd60a;text-decoration:none;font-weight:700;">Support This Project</a>
+  <span style="color:var(--border)">|</span>
+  <a href="#" onclick="openExternal(event,'https://github.com/EerieGoesD/visual-assets-generator/discussions')" style="color:var(--muted);text-decoration:none;font-weight:600;">Feedback</a>
+  <span style="color:var(--border)">|</span>
+  <a href="#" onclick="openExternal(event,'https://github.com/EerieGoesD/visual-assets-generator/issues/new?template=bug-report.md')" style="color:var(--muted);text-decoration:none;font-weight:600;">Report Issue</a>
+  <span style="color:var(--border)">|</span>
+  <a href="#" onclick="openExternal(event,'https://github.com/EerieGoesD/visual-assets-generator/issues/new?template=feature-request.md')" style="color:var(--muted);text-decoration:none;font-weight:600;">Suggest Feature</a>
+  <span style="color:var(--border)">|</span>
+  <a href="#" onclick="event.preventDefault();openFaq()" style="color:var(--muted);text-decoration:none;font-weight:600;">FAQ</a>
+  <span style="color:var(--border)">|</span>
+  <a href="#" onclick="event.preventDefault();openPrivacy('privacy')" style="color:var(--muted);text-decoration:none;font-weight:600;">Privacy</a>
+  <span style="color:var(--border)">|</span>
+  <a href="#" onclick="event.preventDefault();openPrivacy('cookies')" style="color:var(--muted);text-decoration:none;font-weight:600;">Cookies</a>
+</footer>
 
 <script>
 // ─────────────────────────────────────────────
@@ -1120,6 +1093,7 @@ let sourceFileName = '';
 let fitMode = 'contain';  // 'contain' or 'cover'
 let flutterNaming = false;
 let androidSafePaddingEnabled = false;
+let zipEnabled = true;    // true = save one ZIP, false = save a plain folder
 
 const ANDROID_ADAPTIVE_FOREGROUND_SCALE = 0.565;
 const ANDROID_ADAPTIVE_BACKGROUND_COLOR = '#FFFFFF';
@@ -1369,6 +1343,11 @@ function toggleFlutter() {
   rebuildAssetPanel();
 }
 
+function toggleZip() {
+  zipEnabled = !zipEnabled;
+  setToggleChecked('toggleZip', zipEnabled);
+}
+
 function toggleAndroidSafePadding() {
   androidSafePaddingEnabled = !androidSafePaddingEnabled;
   setToggleChecked('toggleAndroidSafePadding', androidSafePaddingEnabled);
@@ -1521,13 +1500,13 @@ function androidAdaptiveBackgroundXml() {
 `;
 }
 
-async function addAndroidAdaptiveIconFiles(zip, src) {
+async function addAndroidAdaptiveIconFiles(outputs, src) {
   let added = 0;
 
-  zip.file('Android/mipmap-anydpi-v26/ic_launcher.xml', androidAdaptiveIconXml());
-  zip.file('Android/mipmap-anydpi-v26/ic_launcher_round.xml', androidAdaptiveIconXml());
-  zip.file('Android/drawable/ic_launcher_background.xml', androidAdaptiveBackgroundXml());
-  zip.file('Android/README-adaptive-icon.txt', [
+  outputs.push({ path: 'Android/mipmap-anydpi-v26/ic_launcher.xml', data: androidAdaptiveIconXml() });
+  outputs.push({ path: 'Android/mipmap-anydpi-v26/ic_launcher_round.xml', data: androidAdaptiveIconXml() });
+  outputs.push({ path: 'Android/drawable/ic_launcher_background.xml', data: androidAdaptiveBackgroundXml() });
+  outputs.push({ path: 'Android/README-adaptive-icon.txt', data: [
     'Android adaptive launcher icon files generated with safe padding.',
     '',
     'Copy these folders into android/app/src/main/res:',
@@ -1540,14 +1519,14 @@ async function addAndroidAdaptiveIconFiles(zip, src) {
     'android:roundIcon="@mipmap/ic_launcher_round"',
     '',
     'The foreground image is centered at 56.5% of the adaptive icon canvas with a white background, which prevents launcher masks from cropping the logo.',
-  ].join('\n'));
+  ].join('\n') });
   added += 4;
 
   for (const spec of ANDROID_ADAPTIVE_FOREGROUNDS) {
     const canvas = renderPaddedContain(src, spec.w, spec.h, ANDROID_ADAPTIVE_FOREGROUND_SCALE);
     const blob = await canvasToBlob(canvas);
     const arrayBuffer = await blob.arrayBuffer();
-    zip.file(spec.file, arrayBuffer);
+    outputs.push({ path: spec.file, data: arrayBuffer });
     added++;
   }
 
@@ -1845,6 +1824,37 @@ function canvasToBlob(canvas) {
   return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
 }
 
+// Base64-encode an ArrayBuffer in chunks (avoids call-stack limits on large buffers)
+function base64FromArrayBuffer(buf) {
+  const bytes = new Uint8Array(buf);
+  let binary = '';
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+  }
+  return btoa(binary);
+}
+
+// Open a link in a new browser tab
+function openExternal(e, url) {
+  if (e) e.preventDefault();
+  window.open(url, '_blank', 'noopener');
+}
+
+// Write one file (with subfolders) into a directory chosen via the File System Access API
+async function writeFileToDir(dirHandle, path, data) {
+  const parts = path.split('/').filter(Boolean);
+  const fileName = parts.pop();
+  let dir = dirHandle;
+  for (const part of parts) {
+    dir = await dir.getDirectoryHandle(part, { create: true });
+  }
+  const fileHandle = await dir.getFileHandle(fileName, { create: true });
+  const writable = await fileHandle.createWritable();
+  await writable.write(typeof data === 'string' ? new Blob([data]) : data);
+  await writable.close();
+}
+
 // ─────────────────────────────────────────────
 // MANUAL PNG ENCODER (bypasses canvas.toBlob to
 // avoid browser alpha-premultiplication artifacts)
@@ -2025,7 +2035,7 @@ async function generate() {
 
   log('Starting asset generation...', 'info');
 
-  const zip = new JSZip();
+  const outputs = [];
   let created = 0, errors = 0;
 
   // Build a lookup: key → asset spec
@@ -2055,7 +2065,7 @@ async function generate() {
       if (spec.ico) {
         // Build multi-resolution ICO file
         const icoBuffer = await buildIco(sourceImage);
-        zip.file(outFile, icoBuffer);
+        outputs.push({ path: outFile, data: icoBuffer });
       } else if (spec.badge) {
         // Badge logos: encode PNG manually to bypass canvas.toBlob()
         // alpha-premultiplication artifacts that break WACK validation
@@ -2063,7 +2073,7 @@ async function generate() {
         const imgData = canvas.getContext('2d').getImageData(0, 0, spec.w, spec.h);
         forceWhiteRGBA(imgData); // final guarantee
         const pngBuffer = buildPNGFromRGBA(spec.w, spec.h, imgData.data);
-        zip.file(outFile, pngBuffer);
+        outputs.push({ path: outFile, data: pngBuffer });
       } else {
         let canvas;
         if (fitMode === 'cover') {
@@ -2074,7 +2084,7 @@ async function generate() {
 
         const blob = await canvasToBlob(canvas);
         const arrayBuffer = await blob.arrayBuffer();
-        zip.file(outFile, arrayBuffer);
+        outputs.push({ path: outFile, data: arrayBuffer });
       }
 
       log(`OK  ${outFile}  (${spec.w}×${spec.h})`, 'ok');
@@ -2091,7 +2101,7 @@ async function generate() {
   if (androidSafePaddingEnabled && hasAndroidSelection) {
     log('Adding Android adaptive icon safe-padding files...', 'info');
     try {
-      const added = await addAndroidAdaptiveIconFiles(zip, sourceImage);
+      const added = await addAndroidAdaptiveIconFiles(outputs, sourceImage);
       created += added;
       log(`OK  Android adaptive icon safe-padding files (${added} files)`, 'ok');
     } catch (err) {
@@ -2102,19 +2112,38 @@ async function generate() {
 
   log(`Done. ${created} created, ${errors} errors.`, 'info');
 
-  // Generate zip
-  log('Compressing ZIP...', 'info');
-  const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
-
-  // Download
-  const url = URL.createObjectURL(zipBlob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'visual-assets.zip';
-  a.click();
-  URL.revokeObjectURL(url);
-
-  log('ZIP downloaded!', 'ok');
+  // Save: one ZIP download, or a plain folder of files (toggle)
+  async function downloadZip() {
+    log('Compressing ZIP...', 'info');
+    const zip = new JSZip();
+    for (const o of outputs) zip.file(o.path, o.data);
+    const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
+    const url = URL.createObjectURL(zipBlob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'visual-assets.zip'; a.click();
+    URL.revokeObjectURL(url);
+    log('ZIP downloaded!', 'ok');
+  }
+  try {
+    if (zipEnabled) {
+      await downloadZip();
+    } else if (window.showDirectoryPicker) {
+      const dirHandle = await window.showDirectoryPicker();
+      log('Writing files to folder...', 'info');
+      let saved = 0;
+      for (const o of outputs) {
+        await writeFileToDir(dirHandle, o.path, o.data);
+        saved++;
+      }
+      log(`Saved ${saved} files to the chosen folder.`, 'ok');
+    } else {
+      log('This browser cannot save a folder; downloading a ZIP instead.', 'skip');
+      await downloadZip();
+    }
+  } catch (err) {
+    if (err && err.name === 'AbortError') log('Save cancelled.', 'skip');
+    else log('ERR saving: ' + (err && err.message ? err.message : err), 'err');
+  }
 
   btn.classList.remove('loading');
   btn.disabled = false;
@@ -2127,90 +2156,58 @@ async function generate() {
 init();
 </script>
 
-<!-- ── Cookie / Privacy logic ── -->
+<!-- Cookie / Privacy / FAQ logic -->
 <script>
-function hideBanner() { document.getElementById('cookieBanner').style.display = 'none'; }
-function acceptCookies() {
-  localStorage.setItem('cookie-consent', 'accepted');
-  hideBanner();
-  initGtag();
-}
-function rejectCookies() {
-  localStorage.setItem('cookie-consent', 'rejected');
-  hideBanner();
-}
+function hideBanner() { var b = document.getElementById('cookieBanner'); if (b) b.style.display = 'none'; }
+function acceptCookies() { localStorage.setItem('cookie-consent', 'accepted'); hideBanner(); initGtag(); }
+function rejectCookies() { localStorage.setItem('cookie-consent', 'rejected'); hideBanner(); }
 
 const POLICY = {
   privacyTitle: 'Privacy Policy',
   cookiesTitle: 'Cookie Policy',
   privacyHtml: `
+    <h3>Summary</h3>
+    <p>Store Asset Studio processes your images entirely in your browser. Your image never leaves your device and is never uploaded to any server.</p>
     <h3>Data controller</h3>
-    <p>This site is operated by EERIE (<a href="https://eeriegoesd.com" target="_blank" style="color:var(--accent)">eeriegoesd.com</a>).</p>
-
+    <p>This site is operated by EERIE (<a href="https://eeriegoesd.com" target="_blank" rel="noreferrer" style="color:var(--accent)">eeriegoesd.com</a>).</p>
     <h3>Data collected</h3>
-    <p>We use Google Analytics 4 (GA4) for anonymous traffic analysis. When you accept cookies, GA4 collects:</p>
-    <ul>
-      <li>IP address (anonymized)</li>
-      <li>Pages visited and visit duration</li>
-      <li>Device type, browser, and operating system</li>
-      <li>Country/region of origin</li>
-    </ul>
-    <p>We do not collect names, emails, or any personally identifiable information. There are no accounts or contact forms.</p>
-
-    <h3>Purpose</h3>
-    <p>Data is used solely to understand how the site is used and improve the user experience.</p>
-
+    <p>We use Google Analytics 4 (GA4) for anonymous traffic analysis, only after you accept cookies. GA4 collects an anonymized IP, pages visited, device/browser/OS, and country/region. We do not collect names, emails, or any personally identifiable information, and there are no accounts.</p>
     <h3>Legal basis</h3>
-    <p>Consent (Article 6(1)(a) GDPR). Analytics cookies are only activated after accepting the cookie banner.</p>
-
-    <h3>Data sharing</h3>
-    <p>GA4 data is processed by Google Ireland Ltd. Google operates under the EU-US Data Privacy Framework.</p>
-
-    <h3>Retention</h3>
-    <p>GA4 data is retained for 14 months. Cookies expire as indicated in the Cookie Policy.</p>
-
+    <p>Consent (Article 6(1)(a) GDPR). Analytics cookies are activated only after you accept the cookie banner.</p>
     <h3>Your rights</h3>
-    <p>Under GDPR, you have the right to: access, rectify, erase your data, restrict processing, data portability, and object to processing. You can withdraw consent at any time by clearing browser cookies or clicking "Decline" on the banner. For questions, contact us at <a href="https://eeriegoesd.com" target="_blank" style="color:var(--accent)">eeriegoesd.com</a>.</p>
-
+    <p>You can access, rectify, erase, restrict, port, or object to processing, and withdraw consent at any time by clearing cookies or declining the banner. Contact us at <a href="https://eeriegoesd.com" target="_blank" rel="noreferrer" style="color:var(--accent)">eeriegoesd.com</a>.</p>
     <h3>Supervisory authority</h3>
-    <p>You may file a complaint with the CNPD (Portuguese Data Protection Authority) at <a href="https://www.cnpd.pt" target="_blank" style="color:var(--accent)">cnpd.pt</a>.</p>
+    <p>You may complain to the CNPD (Portugal) at <a href="https://www.cnpd.pt" target="_blank" rel="noreferrer" style="color:var(--accent)">cnpd.pt</a>.</p>
   `,
   cookiesHtml: `
     <h3>What are cookies?</h3>
-    <p>Cookies are small text files stored in your browser that help analyze site usage.</p>
-
+    <p>Small text files stored in your browser that help analyze site usage.</p>
     <h3>Cookies used</h3>
     <ul>
-      <li><strong>_ga</strong> — Distinguishes unique users. Duration: 2 years. Type: Analytics (Google Analytics).</li>
-      <li><strong>_ga_G-FZ24TLKL16</strong> — Maintains session state. Duration: 2 years. Type: Analytics (Google Analytics).</li>
-      <li><strong>cookie-consent</strong> — Stores your consent choice. Duration: permanent (localStorage). Type: Necessary.</li>
+      <li><strong>_ga</strong> - distinguishes users. Duration: 2 years. Analytics (Google Analytics).</li>
+      <li><strong>_ga_G-FZ24TLKL16</strong> - session state. Duration: 2 years. Analytics (Google Analytics).</li>
+      <li><strong>cookie-consent</strong> - stores your choice. Permanent (localStorage). Necessary.</li>
     </ul>
-
-    <h3>Essential cookies</h3>
-    <p><strong>cookie-consent</strong> (localStorage) is necessary to remember your choice. It does not transmit data to third parties.</p>
-
     <h3>Analytics cookies</h3>
-    <p>Google Analytics cookies are only activated if you accept the cookie banner. If you decline, no analytics cookies are created.</p>
-
+    <p>Google Analytics cookies are activated only if you accept the banner. If you decline, no analytics cookies are created.</p>
     <h3>How to manage cookies</h3>
-    <p>You can delete cookies at any time in your browser settings. To withdraw consent, clear site data and the banner will appear again.</p>
+    <p>Delete cookies anytime in your browser settings. To withdraw consent, clear site data and the banner appears again.</p>
   `
 };
-
 function openPrivacy(type) {
   const modal = document.getElementById('privacyModal');
   modal.querySelector('h2').textContent = type === 'cookies' ? POLICY.cookiesTitle : POLICY.privacyTitle;
   modal.querySelector('.priv-body').innerHTML = type === 'cookies' ? POLICY.cookiesHtml : POLICY.privacyHtml;
   document.getElementById('privacyOverlay').classList.add('open');
 }
-function closePrivacy() {
-  document.getElementById('privacyOverlay').classList.remove('open');
-}
+function closePrivacy() { document.getElementById('privacyOverlay').classList.remove('open'); }
+function openFaq() { document.getElementById('faqOverlay').classList.add('open'); }
+function closeFaq() { document.getElementById('faqOverlay').classList.remove('open'); }
 </script>
 
 <!-- Cookie banner -->
 <div id="cookieBanner" class="cookie-banner">
-  <span>We use cookies for traffic analysis.</span>
+  <span>We use cookies for anonymous traffic analysis.</span>
   <a href="#" onclick="event.preventDefault();openPrivacy('cookies')" style="color:var(--accent);text-decoration:none;">Learn more</a>
   <button onclick="acceptCookies()" class="cookie-accept">Accept</button>
   <button onclick="rejectCookies()" class="cookie-reject">Decline</button>
@@ -2223,12 +2220,34 @@ try {
 } catch(e) { document.getElementById('cookieBanner').style.display = 'flex'; }
 </script>
 
-<!-- Privacy/Cookie policy modal -->
+<!-- Privacy / Cookie modal -->
 <div class="privacy-overlay" id="privacyOverlay" onclick="if(event.target===this)closePrivacy()">
   <div class="privacy-modal" id="privacyModal">
     <button class="close-priv" onclick="closePrivacy()" aria-label="Close">&times;</button>
     <h2></h2>
     <div class="priv-body"></div>
+  </div>
+</div>
+
+<!-- FAQ modal -->
+<div class="privacy-overlay" id="faqOverlay" onclick="if(event.target===this)closeFaq()">
+  <div class="privacy-modal">
+    <button class="close-priv" onclick="closeFaq()" aria-label="Close">&times;</button>
+    <h2>Frequently Asked Questions</h2>
+    <h3>What platforms are supported?</h3>
+    <p>Microsoft Store (WACK-compliant), Windows desktop .ico, macOS, Android (Play Store), iOS (App Store), Chrome Extension, Favicon, Social/OG images, and Flatpak. Each platform includes all required icon sizes and store graphics.</p>
+    <h3>Is my image uploaded to a server?</h3>
+    <p>No. All processing happens locally in your browser using the Canvas API. Your image never leaves your device.</p>
+    <h3>What image size should I use?</h3>
+    <p>At least 1024x1024 for best results, since some assets (like iOS App Store icons) require that resolution. PNG is preferred for transparency.</p>
+    <h3>ZIP or folder?</h3>
+    <p>Use the "Save as ZIP" toggle. When on, you get a single ZIP. When off, the assets are written into a folder you choose (supported in Chrome/Edge; other browsers fall back to a ZIP).</p>
+    <h3>What is the difference between Letterbox and Crop?</h3>
+    <p>Letterbox (contain) fits your whole image inside the target, adding transparent padding if the aspect ratio differs. Crop (cover) fills the target, trimming edges. For square icons they look the same.</p>
+    <h3>How do Windows Store badge logos work?</h3>
+    <p>Badge logos must pass WACK: all visible pixels must be pure white on a transparent background. The tool removes the background automatically using dominant-color detection and Otsu thresholding, then forces the foreground to white.</p>
+    <h3>What is the "Flutter naming convention" option?</h3>
+    <p>When enabled, iOS and macOS icons are exported with the filenames Flutter expects (e.g. Icon-App-60x60@2x.png), so you can drop them straight into a Flutter project.</p>
   </div>
 </div>
 
