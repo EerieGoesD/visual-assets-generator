@@ -6,6 +6,10 @@ use base64::{engine::general_purpose::STANDARD as BASE64, Engine as _};
 #[tauri::command]
 fn write_file(path: String, data: String) -> Result<(), String> {
     let bytes = BASE64.decode(data.as_bytes()).map_err(|e| e.to_string())?;
+    // Create parent directories so folder-mode writes (e.g. <dir>/Assets/x.png) succeed.
+    if let Some(parent) = std::path::Path::new(&path).parent() {
+        std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+    }
     std::fs::write(&path, &bytes).map_err(|e| e.to_string())?;
     Ok(())
 }
