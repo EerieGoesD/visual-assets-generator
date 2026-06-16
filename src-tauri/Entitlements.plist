@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Required for the Mac App Store -->
+    <key>com.apple.security.app-sandbox</key>
+    <true/>
+
+    <!-- Lets the app write the ZIP / folder the user picks in the save/open panel.
+         Without this, saving fails under the sandbox. -->
+    <key>com.apple.security.files.user-selected.read-write</key>
+    <true/>
+
+    <!-- Replace TEAMID with your Apple Developer Team ID (App Store Connect >
+         Membership). The identifier must match the app's bundle id. -->
+    <key>com.apple.application-identifier</key>
+    <string>TEAMID.com.eeriegoesd.storeassetstudio</string>
+    <key>com.apple.developer.team-identifier</key>
+    <string>TEAMID</string>
+</dict>
+</plist>
