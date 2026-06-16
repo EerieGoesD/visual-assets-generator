@@ -2154,6 +2154,15 @@ async function generate() {
 // ─────────────────────────────────────────────
 
 init();
+
+// Folder save uses the File System Access API (showDirectoryPicker). It needs a
+// Chromium browser (Chrome/Edge) AND a secure context (https or localhost) - it
+// is blocked in Brave and unavailable in Firefox/Safari or on file:// pages.
+// Make the toggle honest instead of silently falling back to a ZIP.
+if (!window.showDirectoryPicker) {
+  var _zl = document.querySelector('#toggleZip .toggle-label');
+  if (_zl) _zl.textContent = 'Save as ZIP (folder save needs Chrome or Edge over https)';
+}
 </script>
 
 <!-- Cookie / Privacy / FAQ logic -->
