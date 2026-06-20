@@ -1,6 +1,6 @@
 [package]
 name = "store-asset-studio"
-version = "1.1.0"
+version = "1.1.2"
 description = "Generate every platform app icon and store asset from a single image"
 authors = ["EERIE"]
 edition = "2021"

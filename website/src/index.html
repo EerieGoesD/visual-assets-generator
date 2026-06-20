@@ -606,6 +606,7 @@
     font-size: 11px;
     color: var(--muted);
     flex-shrink: 0;
+    width: 48px;
   }
 
   .ap-slider-val {
@@ -618,7 +619,7 @@
     text-align: right;
   }
 
-  #apSlider {
+  .ap-slider-row input[type=range] {
     flex: 1 1 auto;
     -webkit-appearance: none;
     appearance: none;
@@ -628,7 +629,7 @@
     outline: none;
     cursor: pointer;
   }
-  #apSlider::-webkit-slider-thumb {
+  .ap-slider-row input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
     width: 16px;
@@ -638,13 +639,24 @@
     border: 2px solid var(--surface);
     cursor: pointer;
   }
-  #apSlider::-moz-range-thumb {
+  .ap-slider-row input[type=range]::-moz-range-thumb {
     width: 16px;
     height: 16px;
     border-radius: 50%;
     background: var(--accent);
     border: 2px solid var(--surface);
     cursor: pointer;
+  }
+
+  /* draggable preview icons */
+  .ap-shape canvas { cursor: grab; touch-action: none; }
+  .ap-shape canvas.ap-grabbing { cursor: grabbing; }
+
+  .ap-extra-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-top: 12px;
   }
 
   .ap-hint {
@@ -889,13 +901,6 @@
           <div class="toggle-box"></div>
           <div class="toggle-label">Flutter naming convention</div>
         </div>
-        <div class="toggle-option" id="toggleAndroidSafePadding" onclick="toggleAndroidSafePadding()">
-          <div class="toggle-box"></div>
-          <div>
-            <div class="toggle-label">Add padding to Android app icons</div>
-            <div class="option-help">Creates adaptive icon foreground/background files to prevent Pixel and Android launcher cropping.</div>
-          </div>
-        </div>
       </div>
 
       <div id="androidPreview">
@@ -911,13 +916,28 @@
           </div>
         </div>
         <div class="ap-empty" id="apEmpty">Load an image to preview the Android icon.</div>
-        <div class="ap-slider-row">
-          <span class="ap-slider-label">Padding</span>
-          <input type="range" id="apSlider" min="0" max="50" value="15"
-                 oninput="onAndroidPaddingSlide(this.value)" />
-          <span class="ap-slider-val" id="apSliderVal">15%</span>
+        <div class="ap-controls" id="apControls">
+          <div class="ap-slider-row">
+            <span class="ap-slider-label">Padding</span>
+            <input type="range" id="apSlider" min="0" max="50" value="0"
+                   oninput="onAndroidPaddingSlide(this.value)" />
+            <span class="ap-slider-val" id="apSliderVal">0%</span>
+          </div>
+          <div class="ap-slider-row">
+            <span class="ap-slider-label">Scale</span>
+            <input type="range" id="apScaleSlider" min="50" max="150" value="100"
+                   oninput="onAndroidScaleSlide(this.value)" />
+            <span class="ap-slider-val" id="apScaleVal">100%</span>
+          </div>
+          <div class="ap-extra-row">
+            <div class="toggle-option" id="toggleGrid" onclick="toggleAndroidGrid()">
+              <div class="toggle-box"></div>
+              <div class="toggle-label">Grid</div>
+            </div>
+            <button class="btn-sm" onclick="resetAndroidPreview()">Reset</button>
+          </div>
+          <div class="ap-hint">Drag the icon to nudge it. Padding adds safe margin; Scale resizes the logo.</div>
         </div>
-        <div class="ap-hint">Drag right for more padding (smaller logo, more safe space), left for less.</div>
       </div>
 
       <div class="options-row" style="margin-bottom:10px;">
@@ -1235,12 +1255,16 @@ let sourceImage = null;   // HTMLImageElement
 let sourceFileName = '';
 let fitMode = 'contain';  // 'contain' or 'cover'
 let flutterNaming = false;
-let androidSafePaddingEnabled = false;
 let zipEnabled = true;    // true = save one ZIP, false = save a plain folder
 
-// Foreground size as a fraction of the full 108dp adaptive-icon canvas.
-// Driven live by the padding slider in the Android icon preview.
-let androidForegroundScale = 0.565;
+// Android adaptive-icon preview controls (shown whenever Android is selected).
+// Padding adds safe margin; scale resizes the logo; offset is a drag-nudge in
+// units of the visible viewport; grid is a preview-only alignment overlay.
+let androidPaddingPct = 0;    // 0..50  (% of the visible viewport left as margin)
+let androidScalePct = 100;    // 50..150 (logo size multiplier)
+let androidOffsetX = 0;       // -0.5..0.5 fraction of the visible viewport
+let androidOffsetY = 0;
+let androidGridEnabled = false;
 // The launcher mask only shows the inner 72dp of the 108dp canvas, so the
 // visible viewport is 72/108 of the canvas. Used to keep the preview honest.
 const ANDROID_ADAPTIVE_VIEWPORT_RATIO = 72 / 108;
@@ -1317,6 +1341,8 @@ function init() {
   document.getElementById('fileInput').addEventListener('change', e => {
     if (e.target.files[0]) loadFile(e.target.files[0]);
   });
+
+  initAndroidPreviewDrag();
 }
 
 function buildPlatformCards() {
@@ -1368,6 +1394,7 @@ function togglePlatform(platformId) {
   rebuildAssetPanel();
   updateSummary();
   updateGenerateBtn();
+  updateAndroidPreview();
 }
 
 // ─────────────────────────────────────────────
@@ -1496,64 +1523,75 @@ function toggleZip() {
   setToggleChecked('toggleZip', zipEnabled);
 }
 
-function toggleAndroidSafePadding() {
-  androidSafePaddingEnabled = !androidSafePaddingEnabled;
-  setToggleChecked('toggleAndroidSafePadding', androidSafePaddingEnabled);
-  updateSummary();
-  updateAndroidPreview();
-}
-
 // ─────────────────────────────────────────────
-// ANDROID ICON PREVIEW (live padding slider)
+// ANDROID ICON PREVIEW (padding + scale + drag + grid)
 // ─────────────────────────────────────────────
 
-// Convert between the padding-slider value (% of the visible viewport that is
-// empty margin) and the foreground scale (fraction of the full 108dp canvas).
-function paddingPctToScale(pct) {
-  return ANDROID_ADAPTIVE_VIEWPORT_RATIO * (1 - pct / 100);
+function isAndroidSelected() {
+  return !!document.getElementById('card-android')?.classList.contains('selected');
 }
-function scaleToPaddingPct(scale) {
-  return Math.round((1 - scale / ANDROID_ADAPTIVE_VIEWPORT_RATIO) * 100);
+
+// Fraction of the visible viewport the logo box occupies.
+function androidViewportFill() {
+  return (1 - androidPaddingPct / 100) * (androidScalePct / 100);
 }
 
 function onAndroidPaddingSlide(value) {
-  const pct = Number(value);
-  androidForegroundScale = paddingPctToScale(pct);
-  document.getElementById('apSliderVal').textContent = pct + '%';
+  androidPaddingPct = Number(value);
+  document.getElementById('apSliderVal').textContent = androidPaddingPct + '%';
   drawAndroidPreviews();
 }
 
-// Show/hide the preview block and (re)draw it to match current state.
+function onAndroidScaleSlide(value) {
+  androidScalePct = Number(value);
+  document.getElementById('apScaleVal').textContent = androidScalePct + '%';
+  drawAndroidPreviews();
+}
+
+function toggleAndroidGrid() {
+  androidGridEnabled = !androidGridEnabled;
+  setToggleChecked('toggleGrid', androidGridEnabled);
+  drawAndroidPreviews();
+}
+
+function resetAndroidPreview() {
+  androidPaddingPct = 0;
+  androidScalePct = 100;
+  androidOffsetX = 0;
+  androidOffsetY = 0;
+  updateAndroidPreview();
+}
+
+// Show the preview whenever Android is selected, syncing controls to state.
 function updateAndroidPreview() {
   const panel = document.getElementById('androidPreview');
-  panel.classList.toggle('visible', androidSafePaddingEnabled);
-  if (!androidSafePaddingEnabled) return;
+  const show = isAndroidSelected();
+  panel.classList.toggle('visible', show);
+  if (!show) return;
 
-  // Keep the slider in sync with the current scale.
-  const pct = scaleToPaddingPct(androidForegroundScale);
-  document.getElementById('apSlider').value = pct;
-  document.getElementById('apSliderVal').textContent = pct + '%';
+  document.getElementById('apSlider').value = androidPaddingPct;
+  document.getElementById('apSliderVal').textContent = androidPaddingPct + '%';
+  document.getElementById('apScaleSlider').value = androidScalePct;
+  document.getElementById('apScaleVal').textContent = androidScalePct + '%';
+  setToggleChecked('toggleGrid', androidGridEnabled);
   drawAndroidPreviews();
 }
 
 function drawAndroidPreviews() {
   const stage = document.getElementById('apStage');
   const empty = document.getElementById('apEmpty');
-  const sliderRow = document.querySelector('.ap-slider-row');
-  const hint = document.querySelector('.ap-hint');
+  const controls = document.getElementById('apControls');
 
   if (!sourceImage) {
     stage.style.display = 'none';
+    controls.style.display = 'none';
     empty.style.display = 'block';
-    sliderRow.style.display = 'none';
-    hint.style.display = 'none';
     return;
   }
 
   stage.style.display = 'flex';
+  controls.style.display = 'block';
   empty.style.display = 'none';
-  sliderRow.style.display = 'flex';
-  hint.style.display = 'block';
 
   drawAndroidPreviewShape(document.getElementById('apCanvasCircle'), 'circle');
   drawAndroidPreviewShape(document.getElementById('apCanvasSquircle'), 'squircle');
@@ -1584,13 +1622,59 @@ function drawAndroidPreviewShape(canvas, shape) {
   ctx.fillStyle = ANDROID_ADAPTIVE_BACKGROUND_COLOR;
   ctx.fillRect(0, 0, W, H);
 
-  // The canvas represents the visible viewport, so the logo occupies
-  // (scale / viewportRatio) of it - exactly what the launcher will show.
-  const logoBox = (androidForegroundScale / ANDROID_ADAPTIVE_VIEWPORT_RATIO) * W;
-  const s = Math.min(logoBox / sourceImage.width, logoBox / sourceImage.height);
+  // The canvas represents the visible viewport; the logo box is a fraction of
+  // it, nudged by the drag offset - exactly what the launcher will show.
+  const box = androidViewportFill() * W;
+  const s = Math.min(box / sourceImage.width, box / sourceImage.height);
   const dw = sourceImage.width * s, dh = sourceImage.height * s;
-  ctx.drawImage(sourceImage, (W - dw) / 2, (H - dh) / 2, dw, dh);
+  const cx = W / 2 + androidOffsetX * W;
+  const cy = H / 2 + androidOffsetY * H;
+  ctx.drawImage(sourceImage, cx - dw / 2, cy - dh / 2, dw, dh);
+
+  if (androidGridEnabled) drawAndroidPreviewGrid(ctx, W, H);
   ctx.restore();
+}
+
+function drawAndroidPreviewGrid(ctx, W, H) {
+  ctx.save();
+  ctx.strokeStyle = 'rgba(0,0,0,0.30)';
+  ctx.lineWidth = 1;
+  const n = 4;
+  for (let i = 1; i < n; i++) {
+    const x = Math.round(W * i / n) + 0.5;
+    const y = Math.round(H * i / n) + 0.5;
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// Pointer-drag to nudge the logo; offset is stored in viewport fractions so it
+// maps cleanly onto both the preview and the generated foreground PNGs.
+let apDragging = false, apDragLastX = 0, apDragLastY = 0;
+function clampOffset(v) { return Math.max(-0.5, Math.min(0.5, v)); }
+function initAndroidPreviewDrag() {
+  ['apCanvasCircle', 'apCanvasSquircle'].forEach(id => {
+    const c = document.getElementById(id);
+    c.addEventListener('pointerdown', e => {
+      if (!sourceImage) return;
+      apDragging = true;
+      apDragLastX = e.clientX; apDragLastY = e.clientY;
+      c.classList.add('ap-grabbing');
+      try { c.setPointerCapture(e.pointerId); } catch (_) {}
+    });
+    c.addEventListener('pointermove', e => {
+      if (!apDragging) return;
+      const rect = c.getBoundingClientRect();
+      androidOffsetX = clampOffset(androidOffsetX + (e.clientX - apDragLastX) / rect.width);
+      androidOffsetY = clampOffset(androidOffsetY + (e.clientY - apDragLastY) / rect.height);
+      apDragLastX = e.clientX; apDragLastY = e.clientY;
+      drawAndroidPreviews();
+    });
+    const end = () => { apDragging = false; c.classList.remove('ap-grabbing'); };
+    c.addEventListener('pointerup', end);
+    c.addEventListener('pointercancel', end);
+  });
 }
 
 // ─────────────────────────────────────────────
@@ -1653,8 +1737,8 @@ function updateSummary() {
   });
 
   const extras = [];
-  if (androidSafePaddingEnabled && perPlatform.android) {
-    extras.push('Android adaptive icon padding');
+  if (perPlatform.android) {
+    extras.push('Android adaptive icon files');
   }
 
   bar.innerHTML = `<span class="count">${count} assets</span> selected — ${parts.join(' &nbsp;·&nbsp; ')}${extras.length ? ` &nbsp;+&nbsp; ${extras.join(' + ')}` : ''}`;
@@ -1701,21 +1785,24 @@ function renderCover(src, w, h) {
   return canvas;
 }
 
-function renderPaddedContain(src, w, h, maxScale) {
+// Render the adaptive-icon foreground using the live preview settings
+// (padding, scale, drag offset). The logo box is a fraction of the full 108dp
+// canvas; the visible 72dp viewport is what launchers show.
+function renderAndroidForeground(src, w, h) {
   const canvas = document.createElement('canvas');
   canvas.width = w; canvas.height = h;
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, w, h);
 
-  const maxW = Math.max(1, Math.round(w * maxScale));
-  const maxH = Math.max(1, Math.round(h * maxScale));
-  const scale = Math.min(maxW / src.width, maxH / src.height);
-  const nw = Math.max(1, Math.min(maxW, Math.round(src.width * scale)));
-  const nh = Math.max(1, Math.min(maxH, Math.round(src.height * scale)));
-  const x = Math.floor((w - nw) / 2);
-  const y = Math.floor((h - nh) / 2);
+  const viewport = ANDROID_ADAPTIVE_VIEWPORT_RATIO; // 72/108
+  const box = androidViewportFill() * viewport * w; // logo box, fraction of full canvas
+  const scale = Math.min(box / src.width, box / src.height);
+  const nw = Math.max(1, Math.round(src.width * scale));
+  const nh = Math.max(1, Math.round(src.height * scale));
+  const cx = w / 2 + androidOffsetX * (viewport * w);
+  const cy = h / 2 + androidOffsetY * (viewport * h);
 
-  ctx.drawImage(src, x, y, nw, nh);
+  ctx.drawImage(src, Math.round(cx - nw / 2), Math.round(cy - nh / 2), nw, nh);
   return canvas;
 }
 
@@ -1760,12 +1847,12 @@ async function addAndroidAdaptiveIconFiles(outputs, src) {
     'android:icon="@mipmap/ic_launcher"',
     'android:roundIcon="@mipmap/ic_launcher_round"',
     '',
-    `The foreground image is centered at ${(androidForegroundScale * 100).toFixed(1)}% of the adaptive icon canvas with a white background, which prevents launcher masks from cropping the logo.`,
+    `The foreground logo fills ${Math.round(androidViewportFill() * 100)}% of the visible viewport (padding ${androidPaddingPct}%, scale ${androidScalePct}%) over a white background, which prevents launcher masks from cropping the logo.`,
   ].join('\n') });
   added += 4;
 
   for (const spec of ANDROID_ADAPTIVE_FOREGROUNDS) {
-    const canvas = renderPaddedContain(src, spec.w, spec.h, androidForegroundScale);
+    const canvas = renderAndroidForeground(src, spec.w, spec.h);
     const blob = await canvasToBlob(canvas);
     const arrayBuffer = await blob.arrayBuffer();
     outputs.push({ path: spec.file, data: arrayBuffer });
@@ -2340,14 +2427,14 @@ async function generate() {
     await new Promise(r => setTimeout(r, 0));
   }
 
-  if (androidSafePaddingEnabled && hasAndroidSelection) {
-    log('Adding Android adaptive icon safe-padding files...', 'info');
+  if (hasAndroidSelection) {
+    log('Adding Android adaptive icon files...', 'info');
     try {
       const added = await addAndroidAdaptiveIconFiles(outputs, sourceImage);
       created += added;
-      log(`OK  Android adaptive icon safe-padding files (${added} files)`, 'ok');
+      log(`OK  Android adaptive icon files (${added} files)`, 'ok');
     } catch (err) {
-      log(`ERR Android adaptive icon safe-padding files: ${err.message}`, 'err');
+      log(`ERR Android adaptive icon files: ${err.message}`, 'err');
       errors++;
     }
   }
