@@ -603,10 +603,11 @@
     filter: drop-shadow(0 4px 10px rgba(0,0,0,0.45));
   }
 
-  /* "move" affordance to the left of the preview, signalling the icons are draggable */
+  /* "move" affordance just outside the top-left of the preview, signalling drag */
   .ap-move-hint {
     align-self: flex-start;
-    margin-top: 30px;              /* vertically centre on the 80px canvas */
+    margin-top: 4px;               /* near the top of the icon */
+    margin-right: -8px;            /* nudge closer to the icon (to the right) */
     flex-shrink: 0;
     display: flex;
     align-items: center;
