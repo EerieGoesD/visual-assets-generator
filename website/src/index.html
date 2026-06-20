@@ -142,6 +142,13 @@
   .block { display: flex; flex-direction: column; min-height: 0; }
   .block-grow { flex: 1 1 0; min-height: 0; }
 
+  /* Right pane: the options + Android preview scroll internally so the
+     Generate button stays pinned and the Output Log never collapses. */
+  .pane-right > .options-block { flex: 0 1 auto; min-height: 0; }
+  .options-body { flex: 0 1 auto; min-height: 0; overflow-y: auto; padding-right: 4px; }
+  .pane-right > .block-grow { min-height: 140px; }
+  #generateBtn { flex: 0 0 auto; }
+
   .block-title {
     font-family: var(--sans);
     font-size: 12px;
@@ -882,9 +889,10 @@
   <!-- RIGHT: options + output log -->
   <section class="pane pane-right">
 
-    <div class="block">
+    <div class="block options-block">
       <div class="block-title">Options</div>
 
+      <div class="options-body">
       <div class="options-row" style="margin-bottom:10px;">
         <div class="toggle-option on" id="toggleContain" onclick="toggleOption('toggleContain','contain')">
           <div class="toggle-box">✓</div>
@@ -949,6 +957,7 @@
 
       <div class="summary-bar" id="summaryBar">
         Select platforms and assets to see a summary.
+      </div>
       </div>
 
       <button id="generateBtn" onclick="generate()" disabled>
