@@ -117,9 +117,25 @@
   /* Right pane: the options + Android preview scroll internally so the
      Generate button stays pinned and the Output Log never collapses. */
   .pane-right > .options-block { flex: 0 1 auto; min-height: 0; }
-  .options-body { flex: 0 1 auto; min-height: 0; overflow-y: auto; padding-right: 4px; }
-  .pane-right > .block-grow { min-height: 140px; }
+  .options-body { flex: 0 1 auto; min-height: 0; overflow-y: auto; padding-right: 4px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+  .pane-right > .options-block > #generateBtn { margin-top: 14px; }
   #generateBtn { flex: 0 0 auto; }
+
+  .block-title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .log-btn {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    text-transform: none;
+    color: var(--muted);
+    background: transparent;
+    border: 1px solid var(--border);
+    padding: 3px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .log-btn:hover { color: var(--text); border-color: var(--muted); }
 
   .block-title {
     font-family: var(--sans);
@@ -206,7 +222,8 @@
   #dropzone.has-image {
     border-style: solid;
     border-color: var(--accent);
-    padding: 12px 16px;
+    padding: 8px 12px;
+    align-self: flex-start;   /* shrink to fit the thumbnail, no full-width dead space */
   }
 
   .dropzone-icon {
@@ -516,8 +533,8 @@
   /* ── Android icon preview ── */
   #androidPreview {
     display: none;
-    margin: 4px 0 12px;
-    padding: 14px;
+    margin: 4px 0 10px;
+    padding: 12px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 10px;
@@ -530,15 +547,15 @@
     letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--accent);
-    margin-bottom: 12px;
+    margin-bottom: 6px;
   }
 
   .ap-stage {
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    gap: 26px;
-    padding: 16px 8px;
+    gap: 20px;
+    padding: 10px 8px;
     border-radius: 8px;
     /* gentle wallpaper so the white icon reads like it would on a home screen */
     background: linear-gradient(135deg, #2b3a67 0%, #44307a 50%, #7a2f5f 100%);
@@ -552,8 +569,8 @@
   }
 
   .ap-shape canvas {
-    width: 96px;
-    height: 96px;
+    width: 80px;
+    height: 80px;
     display: block;
     filter: drop-shadow(0 4px 10px rgba(0,0,0,0.45));
   }
@@ -577,7 +594,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-top: 14px;
+    margin-top: 10px;
   }
 
   .ap-slider-label {
@@ -695,40 +712,18 @@
 
   @keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
 
-  /* Log */
-  #logPanel {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 0;
-    min-height: 0;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    overflow: hidden;
-  }
-
-  #logPanel.visible { display: flex; }
-
-  .log-header {
-    padding: 10px 16px;
-    background: var(--surface2);
-    border-bottom: 1px solid var(--border);
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--accent);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-  }
-
+  /* Output Log (shown in a modal popup) */
   #logOutput {
     padding: 14px 16px;
     font-family: var(--mono);
     font-size: 11px;
     line-height: 1.8;
     color: var(--muted);
-    flex: 1 1 0;
-    min-height: 0;
+    max-height: 60vh;
     overflow-y: auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
   }
 
   #logOutput .log-ok { color: var(--success); }
@@ -862,7 +857,10 @@
   <section class="pane pane-right">
 
     <div class="block options-block">
-      <div class="block-title">Options</div>
+      <div class="block-title block-title-row">
+        <span>Options</span>
+        <button class="log-btn" onclick="openLog()">Output Log</button>
+      </div>
 
       <div class="options-body">
       <div class="options-row" style="margin-bottom:10px;">
@@ -938,13 +936,6 @@
       </button>
     </div>
 
-    <div class="block block-grow">
-      <div class="block-title">Output Log</div>
-      <div id="logPanel">
-        <div id="logOutput"></div>
-      </div>
-    </div>
-
   </section>
 
 </main>
@@ -960,6 +951,15 @@
   <span style="color:var(--border)">|</span>
   <a href="#" onclick="openExternal(event,'https://github.com/EerieGoesD/visual-assets-generator/issues/new?template=feature-request.md')" style="color:var(--muted);text-decoration:none;font-weight:600;">Suggest Feature</a>
 </footer>
+
+<!-- Output Log popup -->
+<div class="privacy-overlay" id="logOverlay" onclick="if(event.target===this)closeLog()">
+  <div class="privacy-modal">
+    <button class="close-priv" onclick="closeLog()" aria-label="Close">&times;</button>
+    <h2>Output Log</h2>
+    <div id="logOutput"></div>
+  </div>
+</div>
 
 <script>
 // ─────────────────────────────────────────────
@@ -2249,6 +2249,9 @@ function log(msg, type = 'info') {
   out.scrollTop = out.scrollHeight;
 }
 
+function openLog() { document.getElementById('logOverlay').classList.add('open'); }
+function closeLog() { document.getElementById('logOverlay').classList.remove('open'); }
+
 // ─────────────────────────────────────────────
 // ICO BUILDER
 // ─────────────────────────────────────────────
@@ -2328,12 +2331,11 @@ function buildIco(src) {
 
 async function generate() {
   const btn = document.getElementById('generateBtn');
-  const logPanel = document.getElementById('logPanel');
 
   btn.classList.add('loading');
   btn.disabled = true;
-  logPanel.classList.add('visible');
   document.getElementById('logOutput').innerHTML = '';
+  openLog();
 
   log('Starting asset generation...', 'info');
 
@@ -2433,18 +2435,22 @@ async function generate() {
         log('Save cancelled.', 'skip');
       }
     } else {
-      const dir = await window.__TAURI__.dialog.open({
-        directory: true, multiple: false, title: 'Choose a folder to save the assets'
+      // Use a Save dialog pre-filled with a folder name instead of a bare
+      // "Select Folder" picker. write_file creates parent dirs, so the chosen
+      // path becomes a new folder containing all the assets.
+      const base = await window.__TAURI__.dialog.save({
+        title: 'Save assets folder',
+        defaultPath: 'visual-assets'
       });
-      if (dir) {
-        const base = String(dir).replace(/[\\/]+$/, '');
+      if (base) {
+        const baseClean = String(base).replace(/[\\/]+$/, '');
         log('Writing files to folder...', 'info');
         let saved = 0;
         for (const o of outputs) {
-          await window.__TAURI__.core.invoke('write_file', { path: base + '/' + o.path, data: dataToBase64(o.data) });
+          await window.__TAURI__.core.invoke('write_file', { path: baseClean + '/' + o.path, data: dataToBase64(o.data) });
           saved++;
         }
-        log(`Saved ${saved} files to ${base}`, 'ok');
+        log(`Saved ${saved} files to ${baseClean}`, 'ok');
       } else {
         log('Save cancelled.', 'skip');
       }
