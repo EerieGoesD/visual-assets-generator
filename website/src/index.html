@@ -4,13 +4,41 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<title>Store Asset Studio</title>
+<!-- Primary SEO -->
+<title>Store Asset Studio - App Icons & Store Assets from One Image</title>
+<meta name="description" content="Free browser tool to generate every platform's app icons and store assets from a single image: Microsoft Store, Windows .ico, macOS, Android, iOS, Chrome Extension, Favicon, Social/OG and Flatpak. No install, no signup." />
+<meta name="keywords" content="app icon generator, store assets, windows store assets, windows ico, macos icons, android icons, ios app icons, chrome extension icons, favicon generator, flutter icons" />
 <meta name="author" content="EERIE" />
 <link rel="icon" type="image/png" href="favicon.png" />
+<link rel="apple-touch-icon" href="favicon.png" />
 
-<!-- Local, offline assets (no CDN) -->
-<script src="jszip.min.js"></script>
-<link rel="stylesheet" href="fonts/fonts.css" />
+<!-- Open Graph / Twitter (add canonical, og:url and og:image once the site is hosted) -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Store Asset Studio - App Icons & Store Assets from One Image" />
+<meta property="og:description" content="Upload one image, download every app icon and store asset. Free, runs entirely in your browser." />
+<meta property="og:site_name" content="Store Asset Studio" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Store Asset Studio - App Icons & Store Assets from One Image" />
+<meta name="twitter:description" content="Upload one image, download every app icon and store asset. Free, runs entirely in your browser." />
+
+<!-- Google Analytics - loaded only after cookie consent -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('consent', 'default', { analytics_storage: 'denied' });
+  function initGtag() {
+    gtag('consent', 'update', { analytics_storage: 'granted' });
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=G-FZ24TLKL16';
+    document.head.appendChild(s);
+    gtag('js', new Date());
+    gtag('config', 'G-FZ24TLKL16');
+  }
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #0a0a0f;
@@ -129,8 +157,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-wrap: nowrap;
-    gap: 12px;
+    flex-wrap: wrap;
+    gap: 8px 12px;
     white-space: nowrap;
     padding: 9px 16px;
     border-top: 1px solid var(--border);
@@ -930,6 +958,12 @@
   <a href="#" onclick="openExternal(event,'https://github.com/EerieGoesD/visual-assets-generator/issues/new?template=bug-report.md')" style="color:var(--muted);text-decoration:none;font-weight:600;">Report Issue</a>
   <span style="color:var(--border)">|</span>
   <a href="#" onclick="openExternal(event,'https://github.com/EerieGoesD/visual-assets-generator/issues/new?template=feature-request.md')" style="color:var(--muted);text-decoration:none;font-weight:600;">Suggest Feature</a>
+  <span style="color:var(--border)">|</span>
+  <a href="#" onclick="event.preventDefault();openFaq()" style="color:var(--muted);text-decoration:none;font-weight:600;">FAQ</a>
+  <span style="color:var(--border)">|</span>
+  <a href="#" onclick="event.preventDefault();openPrivacy('privacy')" style="color:var(--muted);text-decoration:none;font-weight:600;">Privacy</a>
+  <span style="color:var(--border)">|</span>
+  <a href="#" onclick="event.preventDefault();openPrivacy('cookies')" style="color:var(--muted);text-decoration:none;font-weight:600;">Cookies</a>
 </footer>
 
 <script>
@@ -2043,16 +2077,24 @@ function base64FromArrayBuffer(buf) {
   return btoa(binary);
 }
 
-// Base64-encode an output entry's data (ArrayBuffer, Uint8Array, or text string)
-function dataToBase64(data) {
-  if (typeof data === 'string') data = new TextEncoder().encode(data);
-  return base64FromArrayBuffer(data);
-}
-
-// Open a URL in the system browser via the Tauri opener plugin
+// Open a link in a new browser tab
 function openExternal(e, url) {
   if (e) e.preventDefault();
-  try { window.__TAURI__.opener.openUrl(url); } catch (err) { /* not in Tauri */ }
+  window.open(url, '_blank', 'noopener');
+}
+
+// Write one file (with subfolders) into a directory chosen via the File System Access API
+async function writeFileToDir(dirHandle, path, data) {
+  const parts = path.split('/').filter(Boolean);
+  const fileName = parts.pop();
+  let dir = dirHandle;
+  for (const part of parts) {
+    dir = await dir.getDirectoryHandle(part, { create: true });
+  }
+  const fileHandle = await dir.getFileHandle(fileName, { create: true });
+  const writable = await fileHandle.createWritable();
+  await writable.write(typeof data === 'string' ? new Blob([data]) : data);
+  await writable.close();
 }
 
 // ─────────────────────────────────────────────
@@ -2312,43 +2354,37 @@ async function generate() {
 
   log(`Done. ${created} created, ${errors} errors.`, 'info');
 
-  // Save: one ZIP, or a plain folder of files (toggle)
+  // Save: one ZIP download, or a plain folder of files (toggle)
+  async function downloadZip() {
+    log('Compressing ZIP...', 'info');
+    const zip = new JSZip();
+    for (const o of outputs) zip.file(o.path, o.data);
+    const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
+    const url = URL.createObjectURL(zipBlob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'visual-assets.zip'; a.click();
+    URL.revokeObjectURL(url);
+    log('ZIP downloaded!', 'ok');
+  }
   try {
     if (zipEnabled) {
-      log('Compressing ZIP...', 'info');
-      const zip = new JSZip();
-      for (const o of outputs) zip.file(o.path, o.data);
-      const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
-      const path = await window.__TAURI__.dialog.save({
-        defaultPath: 'visual-assets.zip',
-        filters: [{ name: 'ZIP archive', extensions: ['zip'] }]
-      });
-      if (path) {
-        const buf = await zipBlob.arrayBuffer();
-        await window.__TAURI__.core.invoke('write_file', { path, data: base64FromArrayBuffer(buf) });
-        log('Saved ZIP: ' + path, 'ok');
-      } else {
-        log('Save cancelled.', 'skip');
+      await downloadZip();
+    } else if (window.showDirectoryPicker) {
+      const dirHandle = await window.showDirectoryPicker();
+      log('Writing files to folder...', 'info');
+      let saved = 0;
+      for (const o of outputs) {
+        await writeFileToDir(dirHandle, o.path, o.data);
+        saved++;
       }
+      log(`Saved ${saved} files to the chosen folder.`, 'ok');
     } else {
-      const dir = await window.__TAURI__.dialog.open({
-        directory: true, multiple: false, title: 'Choose a folder to save the assets'
-      });
-      if (dir) {
-        const base = String(dir).replace(/[\\/]+$/, '');
-        log('Writing files to folder...', 'info');
-        let saved = 0;
-        for (const o of outputs) {
-          await window.__TAURI__.core.invoke('write_file', { path: base + '/' + o.path, data: dataToBase64(o.data) });
-          saved++;
-        }
-        log(`Saved ${saved} files to ${base}`, 'ok');
-      } else {
-        log('Save cancelled.', 'skip');
-      }
+      log('This browser cannot save a folder; downloading a ZIP instead.', 'skip');
+      await downloadZip();
     }
   } catch (err) {
-    log('ERR saving: ' + (err && err.message ? err.message : err), 'err');
+    if (err && err.name === 'AbortError') log('Save cancelled.', 'skip');
+    else log('ERR saving: ' + (err && err.message ? err.message : err), 'err');
   }
 
   btn.classList.remove('loading');
@@ -2360,7 +2396,111 @@ async function generate() {
 // ─────────────────────────────────────────────
 
 init();
+
+// Folder save uses the File System Access API (showDirectoryPicker). It needs a
+// Chromium browser (Chrome/Edge) AND a secure context (https or localhost) - it
+// is blocked in Brave and unavailable in Firefox/Safari or on file:// pages.
+// Make the toggle honest instead of silently falling back to a ZIP.
+if (!window.showDirectoryPicker) {
+  var _zl = document.querySelector('#toggleZip .toggle-label');
+  if (_zl) _zl.textContent = 'Save as ZIP (folder save needs Chrome or Edge over https)';
+}
 </script>
+
+<!-- Cookie / Privacy / FAQ logic -->
+<script>
+function hideBanner() { var b = document.getElementById('cookieBanner'); if (b) b.style.display = 'none'; }
+function acceptCookies() { localStorage.setItem('cookie-consent', 'accepted'); hideBanner(); initGtag(); }
+function rejectCookies() { localStorage.setItem('cookie-consent', 'rejected'); hideBanner(); }
+
+const POLICY = {
+  privacyTitle: 'Privacy Policy',
+  cookiesTitle: 'Cookie Policy',
+  privacyHtml: `
+    <h3>Summary</h3>
+    <p>Store Asset Studio processes your images entirely in your browser. Your image never leaves your device and is never uploaded to any server.</p>
+    <h3>Data controller</h3>
+    <p>This site is operated by EERIE (<a href="https://eeriegoesd.com" target="_blank" rel="noreferrer" style="color:var(--accent)">eeriegoesd.com</a>).</p>
+    <h3>Data collected</h3>
+    <p>We use Google Analytics 4 (GA4) for anonymous traffic analysis, only after you accept cookies. GA4 collects an anonymized IP, pages visited, device/browser/OS, and country/region. We do not collect names, emails, or any personally identifiable information, and there are no accounts.</p>
+    <h3>Legal basis</h3>
+    <p>Consent (Article 6(1)(a) GDPR). Analytics cookies are activated only after you accept the cookie banner.</p>
+    <h3>Your rights</h3>
+    <p>You can access, rectify, erase, restrict, port, or object to processing, and withdraw consent at any time by clearing cookies or declining the banner. Contact us at <a href="https://eeriegoesd.com" target="_blank" rel="noreferrer" style="color:var(--accent)">eeriegoesd.com</a>.</p>
+    <h3>Supervisory authority</h3>
+    <p>You may complain to the CNPD (Portugal) at <a href="https://www.cnpd.pt" target="_blank" rel="noreferrer" style="color:var(--accent)">cnpd.pt</a>.</p>
+  `,
+  cookiesHtml: `
+    <h3>What are cookies?</h3>
+    <p>Small text files stored in your browser that help analyze site usage.</p>
+    <h3>Cookies used</h3>
+    <ul>
+      <li><strong>_ga</strong> - distinguishes users. Duration: 2 years. Analytics (Google Analytics).</li>
+      <li><strong>_ga_G-FZ24TLKL16</strong> - session state. Duration: 2 years. Analytics (Google Analytics).</li>
+      <li><strong>cookie-consent</strong> - stores your choice. Permanent (localStorage). Necessary.</li>
+    </ul>
+    <h3>Analytics cookies</h3>
+    <p>Google Analytics cookies are activated only if you accept the banner. If you decline, no analytics cookies are created.</p>
+    <h3>How to manage cookies</h3>
+    <p>Delete cookies anytime in your browser settings. To withdraw consent, clear site data and the banner appears again.</p>
+  `
+};
+function openPrivacy(type) {
+  const modal = document.getElementById('privacyModal');
+  modal.querySelector('h2').textContent = type === 'cookies' ? POLICY.cookiesTitle : POLICY.privacyTitle;
+  modal.querySelector('.priv-body').innerHTML = type === 'cookies' ? POLICY.cookiesHtml : POLICY.privacyHtml;
+  document.getElementById('privacyOverlay').classList.add('open');
+}
+function closePrivacy() { document.getElementById('privacyOverlay').classList.remove('open'); }
+function openFaq() { document.getElementById('faqOverlay').classList.add('open'); }
+function closeFaq() { document.getElementById('faqOverlay').classList.remove('open'); }
+</script>
+
+<!-- Cookie banner -->
+<div id="cookieBanner" class="cookie-banner">
+  <span>We use cookies for anonymous traffic analysis.</span>
+  <a href="#" onclick="event.preventDefault();openPrivacy('cookies')" style="color:var(--accent);text-decoration:none;">Learn more</a>
+  <button onclick="acceptCookies()" class="cookie-accept">Accept</button>
+  <button onclick="rejectCookies()" class="cookie-reject">Decline</button>
+</div>
+<script>
+try {
+  var c = localStorage.getItem('cookie-consent');
+  if (!c) document.getElementById('cookieBanner').style.display = 'flex';
+  else if (c === 'accepted') initGtag();
+} catch(e) { document.getElementById('cookieBanner').style.display = 'flex'; }
+</script>
+
+<!-- Privacy / Cookie modal -->
+<div class="privacy-overlay" id="privacyOverlay" onclick="if(event.target===this)closePrivacy()">
+  <div class="privacy-modal" id="privacyModal">
+    <button class="close-priv" onclick="closePrivacy()" aria-label="Close">&times;</button>
+    <h2></h2>
+    <div class="priv-body"></div>
+  </div>
+</div>
+
+<!-- FAQ modal -->
+<div class="privacy-overlay" id="faqOverlay" onclick="if(event.target===this)closeFaq()">
+  <div class="privacy-modal">
+    <button class="close-priv" onclick="closeFaq()" aria-label="Close">&times;</button>
+    <h2>Frequently Asked Questions</h2>
+    <h3>What platforms are supported?</h3>
+    <p>Microsoft Store (WACK-compliant), Windows desktop .ico, macOS, Android (Play Store), iOS (App Store), Chrome Extension, Favicon, Social/OG images, and Flatpak. Each platform includes all required icon sizes and store graphics.</p>
+    <h3>Is my image uploaded to a server?</h3>
+    <p>No. All processing happens locally in your browser using the Canvas API. Your image never leaves your device.</p>
+    <h3>What image size should I use?</h3>
+    <p>At least 1024x1024 for best results, since some assets (like iOS App Store icons) require that resolution. PNG is preferred for transparency.</p>
+    <h3>ZIP or folder?</h3>
+    <p>Use the "Save as ZIP" toggle. When on, you get a single ZIP. When off, the assets are written into a folder you choose (supported in Chrome/Edge; other browsers fall back to a ZIP).</p>
+    <h3>What is the difference between Letterbox and Crop?</h3>
+    <p>Letterbox (contain) fits your whole image inside the target, adding transparent padding if the aspect ratio differs. Crop (cover) fills the target, trimming edges. For square icons they look the same.</p>
+    <h3>How do Windows Store badge logos work?</h3>
+    <p>Badge logos must pass WACK: all visible pixels must be pure white on a transparent background. The tool removes the background automatically using dominant-color detection and Otsu thresholding, then forces the foreground to white.</p>
+    <h3>What is the "Flutter naming convention" option?</h3>
+    <p>When enabled, iOS and macOS icons are exported with the filenames Flutter expects (e.g. Icon-App-60x60@2x.png), so you can drop them straight into a Flutter project.</p>
+  </div>
+</div>
 
 </body>
 </html>
