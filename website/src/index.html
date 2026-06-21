@@ -1827,13 +1827,14 @@ function renderAndroidForeground(src, w, h) {
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, w, h);
 
-  const viewport = ANDROID_ADAPTIVE_VIEWPORT_RATIO; // 72/108
-  const box = androidViewportFill() * viewport * w; // logo box, fraction of full canvas
+  // Match the preview exactly: the foreground canvas fills the full 108dp box,
+  // so what you see in the preview is what the exported PNG produces (WYSIWYG).
+  const box = androidViewportFill() * w; // logo box, fraction of full canvas
   const scale = Math.min(box / src.width, box / src.height);
   const nw = Math.max(1, Math.round(src.width * scale));
   const nh = Math.max(1, Math.round(src.height * scale));
-  const cx = w / 2 + androidOffsetX * (viewport * w);
-  const cy = h / 2 + androidOffsetY * (viewport * h);
+  const cx = w / 2 + androidOffsetX * w;
+  const cy = h / 2 + androidOffsetY * h;
 
   ctx.drawImage(src, Math.round(cx - nw / 2), Math.round(cy - nh / 2), nw, nh);
   return canvas;
