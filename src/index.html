@@ -585,6 +585,9 @@
     align-items: center;
     color: rgba(255,255,255,0.75);
   }
+  /* Windows tiles fill their corner (unlike the Android circle), so the move
+     icon needs more clearance to sit clearly outside the icon. */
+  #windowsPreview .ap-move-hint { margin-right: -8px; }
 
   .ap-shape-label {
     font-family: var(--mono);
