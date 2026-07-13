@@ -530,8 +530,8 @@
     color: var(--muted);
   }
 
-  /* ── Android icon preview ── */
-  #androidPreview {
+  /* ── Icon preview panels (Android + Windows) ── */
+  #androidPreview, #windowsPreview {
     display: none;
     margin: 4px 0 10px;
     padding: 12px;
@@ -539,7 +539,7 @@
     border: 1px solid var(--border);
     border-radius: 10px;
   }
-  #androidPreview.visible { display: block; }
+  #androidPreview.visible, #windowsPreview.visible { display: block; }
 
   .ap-title {
     font-family: var(--mono);
@@ -932,6 +932,46 @@
         </div>
       </div>
 
+      <div id="windowsPreview">
+        <div class="ap-title">Windows app icon preview</div>
+        <div class="ap-stage" id="wpStage">
+          <span class="ap-move-hint" title="Drag an icon to move it">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
+          </span>
+          <div class="ap-shape">
+            <canvas id="wpCanvasLight" width="256" height="256" title="Drag to move the icon"></canvas>
+            <span class="ap-shape-label">Light</span>
+          </div>
+          <div class="ap-shape">
+            <canvas id="wpCanvasDark" width="256" height="256" title="Drag to move the icon"></canvas>
+            <span class="ap-shape-label">Dark</span>
+          </div>
+        </div>
+        <div class="ap-empty" id="wpEmpty">Load an image to preview the Windows icon.</div>
+        <div class="ap-controls" id="wpControls">
+          <div class="ap-slider-row">
+            <span class="ap-slider-label">Padding</span>
+            <input type="range" id="wpSlider" min="0" max="50" value="0"
+                   oninput="onWindowsPaddingSlide(this.value)" />
+            <span class="ap-slider-val" id="wpSliderVal">0%</span>
+          </div>
+          <div class="ap-slider-row">
+            <span class="ap-slider-label">Scale</span>
+            <input type="range" id="wpScaleSlider" min="50" max="150" value="100"
+                   oninput="onWindowsScaleSlide(this.value)" />
+            <span class="ap-slider-val" id="wpScaleVal">100%</span>
+          </div>
+          <div class="ap-extra-row">
+            <div class="toggle-option" id="toggleWinGrid" onclick="toggleWindowsGrid()">
+              <div class="toggle-box"></div>
+              <div class="toggle-label">Grid</div>
+            </div>
+            <button class="btn-sm" onclick="resetWindowsPreview()">Reset</button>
+          </div>
+          <div class="ap-hint">Applies to all Windows square icons (tiles, logos, .ico). Drag to nudge; Padding adds margin; Scale resizes.</div>
+        </div>
+      </div>
+
       <div class="options-row" style="margin-bottom:10px;">
         <div class="toggle-option on" id="toggleZip" onclick="toggleZip()">
           <div class="toggle-box">✓</div>
@@ -1254,6 +1294,14 @@ let androidScalePct = 100;    // 50..150 (logo size multiplier)
 let androidOffsetX = 0;       // -0.5..0.5 fraction of the visible viewport
 let androidOffsetY = 0;
 let androidGridEnabled = false;
+
+// Windows app-icon (.ico) preview controls (shown when Microsoft Store is selected).
+// Padding adds transparent margin; scale resizes the logo; offset is a drag-nudge.
+let windowsPaddingPct = 0;    // 0..50  (% margin)
+let windowsScalePct = 100;    // 50..150 (logo size multiplier)
+let windowsOffsetX = 0;       // -0.5..0.5 fraction of the icon
+let windowsOffsetY = 0;
+let windowsGridEnabled = false;
 // The launcher mask only shows the inner 72dp of the 108dp canvas, so the
 // visible viewport is 72/108 of the canvas. Used to keep the preview honest.
 const ANDROID_ADAPTIVE_VIEWPORT_RATIO = 72 / 108;
@@ -1332,6 +1380,7 @@ function init() {
   });
 
   initAndroidPreviewDrag();
+  initWindowsPreviewDrag();
 }
 
 function buildPlatformCards() {
@@ -1384,6 +1433,7 @@ function togglePlatform(platformId) {
   updateSummary();
   updateGenerateBtn();
   updateAndroidPreview();
+  updateWindowsPreview();
 }
 
 // ─────────────────────────────────────────────
@@ -1686,6 +1736,169 @@ function initAndroidPreviewDrag() {
 }
 
 // ─────────────────────────────────────────────
+// WINDOWS APP-ICON (.ico) PREVIEW
+// ─────────────────────────────────────────────
+
+function isWindowsSelected() {
+  return !!document.getElementById('card-windows')?.classList.contains('selected');
+}
+
+// Fraction of the square icon the logo box occupies.
+function windowsFill() {
+  return (1 - windowsPaddingPct / 100) * (windowsScalePct / 100);
+}
+
+function onWindowsPaddingSlide(value) {
+  windowsPaddingPct = Number(value);
+  document.getElementById('wpSliderVal').textContent = windowsPaddingPct + '%';
+  drawWindowsPreviews();
+}
+
+function setWindowsScale(pct) {
+  windowsScalePct = Math.max(50, Math.min(150, Math.round(pct)));
+  document.getElementById('wpScaleSlider').value = windowsScalePct;
+  document.getElementById('wpScaleVal').textContent = windowsScalePct + '%';
+  drawWindowsPreviews();
+}
+
+function onWindowsScaleSlide(value) {
+  setWindowsScale(Number(value));
+}
+
+function toggleWindowsGrid() {
+  windowsGridEnabled = !windowsGridEnabled;
+  setToggleChecked('toggleWinGrid', windowsGridEnabled);
+  drawWindowsPreviews();
+}
+
+function resetWindowsPreview() {
+  windowsPaddingPct = 0;
+  windowsScalePct = 100;
+  windowsOffsetX = 0;
+  windowsOffsetY = 0;
+  updateWindowsPreview();
+}
+
+// Show the preview whenever Microsoft Store is selected, syncing controls.
+function updateWindowsPreview() {
+  const panel = document.getElementById('windowsPreview');
+  const show = isWindowsSelected();
+  panel.classList.toggle('visible', show);
+  if (!show) return;
+
+  document.getElementById('wpSlider').value = windowsPaddingPct;
+  document.getElementById('wpSliderVal').textContent = windowsPaddingPct + '%';
+  document.getElementById('wpScaleSlider').value = windowsScalePct;
+  document.getElementById('wpScaleVal').textContent = windowsScalePct + '%';
+  setToggleChecked('toggleWinGrid', windowsGridEnabled);
+  drawWindowsPreviews();
+}
+
+function drawWindowsPreviews() {
+  const stage = document.getElementById('wpStage');
+  const empty = document.getElementById('wpEmpty');
+  const controls = document.getElementById('wpControls');
+
+  if (!sourceImage) {
+    stage.style.display = 'none';
+    controls.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+
+  stage.style.display = 'flex';
+  controls.style.display = 'block';
+  empty.style.display = 'none';
+
+  drawWindowsPreviewShape(document.getElementById('wpCanvasLight'), 'light');
+  drawWindowsPreviewShape(document.getElementById('wpCanvasDark'), 'dark');
+}
+
+function drawWindowsPreviewShape(canvas, theme) {
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  // Rounded-square tile on a light or dark background (to check transparency).
+  ctx.save();
+  const r = W * 0.1;
+  ctx.beginPath();
+  ctx.moveTo(r, 0);
+  ctx.arcTo(W, 0, W, H, r);
+  ctx.arcTo(W, H, 0, H, r);
+  ctx.arcTo(0, H, 0, 0, r);
+  ctx.arcTo(0, 0, W, 0, r);
+  ctx.closePath();
+  ctx.clip();
+
+  ctx.fillStyle = theme === 'light' ? '#e9e9ee' : '#1c1c22';
+  ctx.fillRect(0, 0, W, H);
+
+  // Logo box is a fraction of the square, nudged by the drag offset.
+  const box = windowsFill() * W;
+  const s = Math.min(box / sourceImage.width, box / sourceImage.height);
+  const dw = sourceImage.width * s, dh = sourceImage.height * s;
+  const cx = W / 2 + windowsOffsetX * W;
+  const cy = H / 2 + windowsOffsetY * H;
+  ctx.drawImage(sourceImage, cx - dw / 2, cy - dh / 2, dw, dh);
+
+  if (windowsGridEnabled) drawAndroidPreviewGrid(ctx, W, H);
+  ctx.restore();
+}
+
+// Render the actual .ico artwork (transparent background) using the preview
+// settings. At defaults (0 padding, 100 scale) this matches a plain contain.
+function renderWindowsIcon(src, w, h) {
+  const canvas = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, w, h);
+
+  const box = windowsFill() * Math.min(w, h);
+  const s = Math.min(box / src.width, box / src.height);
+  const nw = Math.max(1, Math.round(src.width * s));
+  const nh = Math.max(1, Math.round(src.height * s));
+  const cx = w / 2 + windowsOffsetX * w;
+  const cy = h / 2 + windowsOffsetY * h;
+
+  ctx.drawImage(src, Math.round(cx - nw / 2), Math.round(cy - nh / 2), nw, nh);
+  return canvas;
+}
+
+let wpDragging = false, wpDragLastX = 0, wpDragLastY = 0;
+function initWindowsPreviewDrag() {
+  ['wpCanvasLight', 'wpCanvasDark'].forEach(id => {
+    const c = document.getElementById(id);
+    c.addEventListener('pointerdown', e => {
+      if (!sourceImage) return;
+      wpDragging = true;
+      wpDragLastX = e.clientX; wpDragLastY = e.clientY;
+      c.classList.add('ap-grabbing');
+      try { c.setPointerCapture(e.pointerId); } catch (_) {}
+    });
+    c.addEventListener('pointermove', e => {
+      if (!wpDragging) return;
+      const rect = c.getBoundingClientRect();
+      windowsOffsetX = clampOffset(windowsOffsetX + (e.clientX - wpDragLastX) / rect.width);
+      windowsOffsetY = clampOffset(windowsOffsetY + (e.clientY - wpDragLastY) / rect.height);
+      wpDragLastX = e.clientX; wpDragLastY = e.clientY;
+      drawWindowsPreviews();
+    });
+    const end = () => { wpDragging = false; c.classList.remove('ap-grabbing'); };
+    c.addEventListener('pointerup', end);
+    c.addEventListener('pointercancel', end);
+  });
+
+  // Scroll the wheel over the preview area to scale the icon in/out.
+  const stage = document.getElementById('wpStage');
+  stage.addEventListener('wheel', e => {
+    if (!sourceImage) return;
+    e.preventDefault();
+    setWindowsScale(windowsScalePct + (e.deltaY < 0 ? 4 : -4));
+  }, { passive: false });
+}
+
+// ─────────────────────────────────────────────
 // IMAGE LOAD
 // ─────────────────────────────────────────────
 
@@ -1716,8 +1929,9 @@ function showPreview(img, name) {
   document.getElementById('previewName').textContent = name;
   document.getElementById('previewDims').textContent = `${img.width} × ${img.height} px`;
 
-  // Refresh the Android icon preview with the newly loaded image.
+  // Refresh the icon previews with the newly loaded image.
   updateAndroidPreview();
+  updateWindowsPreview();
 }
 
 // ─────────────────────────────────────────────
@@ -2290,7 +2504,7 @@ function buildIco(src) {
   const pngBlobs = [];
 
   for (const s of sizes) {
-    const canvas = renderContain(src, s, s);
+    const canvas = renderWindowsIcon(src, s, s);
     const ctx = canvas.getContext('2d');
     const imgData = ctx.getImageData(0, 0, s, s);
 
@@ -2408,7 +2622,12 @@ async function generate() {
         outputs.push({ path: outFile, data: pngBuffer });
       } else {
         let canvas;
-        if (fitMode === 'cover') {
+        // Windows square app icons (tiles, Square 44/150, Store logo) follow the
+        // Windows icon preview controls (padding / scale / position). Badge logos,
+        // wide/splash banners and listing screenshots are left untouched.
+        if (spec.platformId === 'windows' && spec.w === spec.h && spec.file.startsWith('Assets/')) {
+          canvas = renderWindowsIcon(sourceImage, spec.w, spec.h);
+        } else if (fitMode === 'cover') {
           canvas = renderCover(sourceImage, spec.w, spec.h);
         } else {
           canvas = renderContain(sourceImage, spec.w, spec.h);
