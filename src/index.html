@@ -2625,10 +2625,11 @@ async function generate() {
         outputs.push({ path: outFile, data: pngBuffer });
       } else {
         let canvas;
-        // Windows square app icons (tiles, Square 44/150, Store logo) follow the
-        // Windows icon preview controls (padding / scale / position). Badge logos,
-        // wide/splash banners and listing screenshots are left untouched.
-        if (spec.platformId === 'windows' && spec.w === spec.h && spec.file.startsWith('Assets/')) {
+        // Every Microsoft Store asset (tiles, square logos, wide logo, splash,
+        // and listing screenshots) follows the Windows icon preview controls
+        // (padding / scale / position). Badge logos keep their WACK white-glyph
+        // processing and the .ico has its own path, both handled above.
+        if (spec.platformId === 'windows') {
           canvas = renderWindowsIcon(sourceImage, spec.w, spec.h);
         } else if (fitMode === 'cover') {
           canvas = renderCover(sourceImage, spec.w, spec.h);
