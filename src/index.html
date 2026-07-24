@@ -247,7 +247,7 @@
   .dropzone-text strong { color: var(--accent); cursor: pointer; }
   .dz-hint { color: var(--muted); opacity: 0.6; font-size: 11px; }
 
-  #fileInput { display: none; }
+  #fileInput, #shotInput { display: none; }
 
   #imagePreview {
     display: none;
@@ -819,6 +819,189 @@
     display: flex; align-items: center; justify-content: center;
   }
   .privacy-modal .close-priv:hover { border-color: var(--danger, #ff5555); color: var(--danger, #ff5555); }
+
+  /* ── Tab bar ─────────────────────────────────────────────── */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-top: 12px;
+  }
+  .tab {
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    color: var(--muted);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    padding: 7px 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active {
+    color: #fff;
+    background: var(--surface2);
+    border-color: var(--border);
+  }
+  main.view-hidden { display: none; }
+
+  /* ── Screenshot generator ────────────────────────────────── */
+  #shotDrop {
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 18px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--surface);
+  }
+  #shotDrop:hover, #shotDrop.drag-over {
+    border-color: var(--accent);
+    background: rgba(255,107,43,0.04);
+  }
+
+  .shot-list {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-right: 4px;
+  }
+  .shot-row {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+  .shot-thumb {
+    width: 62px; height: 40px;
+    object-fit: contain;
+    background: var(--surface2);
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+  .shot-meta { min-width: 0; flex: 1 1 auto; }
+  .shot-name {
+    font-size: 12px;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .shot-dims {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .shot-warn { color: var(--accent2); }
+  .shot-x {
+    flex-shrink: 0;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 5px;
+    width: 24px; height: 24px;
+    cursor: pointer;
+    font-size: 13px;
+    line-height: 1;
+  }
+  .shot-x:hover { color: #fff; border-color: var(--accent); }
+  .shot-empty {
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 11px;
+    text-align: center;
+    padding: 26px 10px;
+  }
+
+  .size-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .size-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .size-card:hover { border-color: var(--muted); }
+  .size-card.active {
+    border-color: var(--accent);
+    background: rgba(255,107,43,0.06);
+  }
+  .size-card .sz {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .size-card .sz-note {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  .swatches { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .swatch {
+    width: 26px; height: 26px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .swatch.active { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(255,107,43,0.25); }
+  .color-input {
+    width: 42px; height: 28px;
+    padding: 0;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .color-hex {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 8px;
+    width: 92px;
+    text-transform: uppercase;
+  }
+
+  #shotGenerateBtn {
+    width: 100%;
+    padding: 13px;
+    background: var(--accent);
+    color: #fff;
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 0.3px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 14px;
+    flex: 0 0 auto;
+    transition: all 0.15s;
+  }
+  #shotGenerateBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+  #shotGenerateBtn:not(:disabled):hover { background: var(--accent2); }
 </style>
 </head>
 <body>
@@ -828,12 +1011,16 @@
     <img class="app-logo" src="favicon.png" alt="" />
     <div>
       <h1>Store Asset Studio</h1>
-      <p class="subtitle">Generate every platform's app icons and store assets from one image.</p>
+      <p class="subtitle" id="headerSubtitle">Generate every platform's app icons and store assets from one image.</p>
     </div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" id="tabAssets" onclick="switchTab('assets')">Assets Generator</button>
+    <button class="tab" id="tabShots" onclick="switchTab('shots')">Screenshot Generator</button>
   </div>
 </header>
 
-<main>
+<main id="viewAssets">
 
   <!-- LEFT: source image + platforms -->
   <section class="pane pane-left">
@@ -991,6 +1178,86 @@
         Generate &amp; Save
         <div class="btn-spinner"></div>
       </button>
+    </div>
+
+  </section>
+
+</main>
+
+<!-- ══ SCREENSHOT GENERATOR ═════════════════════════════════ -->
+<main id="viewShots" class="view-hidden">
+
+  <!-- LEFT: the screenshots to process -->
+  <section class="pane pane-left">
+
+    <div class="block">
+      <div class="block-title">Screenshots</div>
+      <div id="shotDrop">
+        <span class="dropzone-icon">🖼️</span>
+        <p class="dropzone-text">Drop screenshots here, or click to choose. Add as many as you like.</p>
+        <input type="file" id="shotInput" accept=".png,.jpg,.jpeg" multiple />
+      </div>
+    </div>
+
+    <div class="block block-grow">
+      <div class="block-title-row">
+        <div class="block-title">Loaded</div>
+        <button class="log-btn" onclick="clearShots()">Remove all</button>
+      </div>
+      <div class="shot-list" id="shotList">
+        <div class="shot-empty">Nothing loaded yet.</div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- RIGHT: size, colour, output -->
+  <section class="pane pane-right">
+
+    <div class="block options-block">
+      <div class="block-title">Canvas Size</div>
+      <div class="options-body">
+        <div class="size-grid" id="sizeGrid"></div>
+
+        <div class="block-title" style="margin-top:16px">Background</div>
+        <div class="swatches">
+          <div class="swatch" data-color="#000000" style="background:#000000" onclick="setShotColor('#000000')"></div>
+          <div class="swatch" data-color="#0A0A0C" style="background:#0A0A0C" onclick="setShotColor('#0A0A0C')"></div>
+          <div class="swatch" data-color="#1A1A24" style="background:#1A1A24" onclick="setShotColor('#1A1A24')"></div>
+          <div class="swatch" data-color="#F5F5F7" style="background:#F5F5F7" onclick="setShotColor('#F5F5F7')"></div>
+          <div class="swatch" data-color="#FFFFFF" style="background:#FFFFFF" onclick="setShotColor('#FFFFFF')"></div>
+          <input type="color" class="color-input" id="shotColorPicker" value="#000000"
+                 oninput="setShotColor(this.value)" title="Any colour" />
+          <input type="text" class="color-hex" id="shotColorHex" value="#000000"
+                 onchange="setShotColor(this.value)" spellcheck="false" />
+        </div>
+
+        <div class="block-title" style="margin-top:16px">Scaling</div>
+        <div class="toggle-option on" id="toggleShotPad" onclick="setShotFit('pad')">
+          <div class="toggle-box">✓</div>
+          <span>Never enlarge, just pad (keeps the picture sharp)</span>
+        </div>
+        <div class="toggle-option" id="toggleShotFit" onclick="setShotFit('fit')" style="margin-top:8px">
+          <div class="toggle-box"></div>
+          <span>Scale up to fill the canvas</span>
+        </div>
+
+        <div class="block-title" style="margin-top:16px">Output</div>
+        <div class="toggle-option on" id="toggleShotZip" onclick="toggleShotZip()">
+          <div class="toggle-box">✓</div>
+          <span>Save as one ZIP file</span>
+        </div>
+      </div>
+
+      <button id="shotGenerateBtn" onclick="generateShots()" disabled>Resize Screenshots</button>
+    </div>
+
+    <div class="block">
+      <div class="block-title-row">
+        <div class="block-title">Summary</div>
+        <button class="log-btn" onclick="openLog()">Output Log</button>
+      </div>
+      <div class="summary-bar" id="shotSummary">No screenshots loaded.</div>
     </div>
 
   </section>
@@ -1385,6 +1652,7 @@ function init() {
 
   initAndroidPreviewDrag();
   initWindowsPreviewDrag();
+  initShots();
 }
 
 function buildPlatformCards() {
@@ -2716,6 +2984,301 @@ async function generate() {
 
   btn.classList.remove('loading');
   btn.disabled = false;
+}
+
+
+// ─────────────────────────────────────────────
+// TABS
+// ─────────────────────────────────────────────
+
+const SUBTITLES = {
+  assets: "Generate every platform's app icons and store assets from one image.",
+  shots:  "Pad screenshots onto an App Store canvas size, in bulk."
+};
+
+function switchTab(name) {
+  const onShots = name === 'shots';
+  document.getElementById('viewAssets').classList.toggle('view-hidden', onShots);
+  document.getElementById('viewShots').classList.toggle('view-hidden', !onShots);
+  document.getElementById('tabAssets').classList.toggle('active', !onShots);
+  document.getElementById('tabShots').classList.toggle('active', onShots);
+  document.getElementById('headerSubtitle').textContent = SUBTITLES[name];
+}
+
+// ─────────────────────────────────────────────
+// SCREENSHOT GENERATOR
+// ─────────────────────────────────────────────
+
+// The only canvas sizes the Mac App Store accepts for screenshots. Anything
+// else is rejected with "The dimensions of one or more screenshots are wrong".
+const SHOT_SIZES = [
+  { w: 1280, h: 800,  note: 'Smallest accepted' },
+  { w: 1440, h: 900,  note: '' },
+  { w: 2560, h: 1600, note: 'Retina, most common' },
+  { w: 2880, h: 1800, note: 'Largest accepted' }
+];
+
+let shots = [];                 // { img, name, width, height }
+let shotSize = SHOT_SIZES[2];   // 2560 x 1600 by default
+let shotColor = '#000000';
+let shotFit = 'pad';            // 'pad' = never enlarge, 'fit' = scale to fill
+let shotZip = true;
+
+function buildSizeCards() {
+  const grid = document.getElementById('sizeGrid');
+  grid.innerHTML = '';
+  SHOT_SIZES.forEach(sz => {
+    const card = document.createElement('div');
+    card.className = 'size-card' + (sz.w === shotSize.w ? ' active' : '');
+    card.innerHTML = '<div class="sz">' + sz.w + ' × ' + sz.h + '</div>' +
+                     '<div class="sz-note">' + (sz.note || '&nbsp;') + '</div>';
+    card.onclick = () => { shotSize = sz; buildSizeCards(); renderShotList(); };
+    grid.appendChild(card);
+  });
+}
+
+function setShotColor(value) {
+  const hex = normaliseHex(value);
+  if (!hex) return;
+  shotColor = hex;
+  document.getElementById('shotColorPicker').value = hex;
+  document.getElementById('shotColorHex').value = hex;
+  document.querySelectorAll('.swatch').forEach(sw => {
+    sw.classList.toggle('active', sw.dataset.color.toUpperCase() === hex.toUpperCase());
+  });
+}
+
+// Accepts "#abc", "abc", "#aabbcc" or "aabbcc" and returns "#AABBCC".
+function normaliseHex(value) {
+  let v = String(value || '').trim().replace(/^#/, '');
+  if (/^[0-9a-fA-F]{3}$/.test(v)) v = v.split('').map(c => c + c).join('');
+  if (!/^[0-9a-fA-F]{6}$/.test(v)) return null;
+  return '#' + v.toUpperCase();
+}
+
+function setShotFit(mode) {
+  shotFit = mode;
+  setToggleChecked('toggleShotPad', mode === 'pad');
+  setToggleChecked('toggleShotFit', mode === 'fit');
+  renderShotList();
+}
+
+function toggleShotZip() {
+  shotZip = !shotZip;
+  setToggleChecked('toggleShotZip', shotZip);
+}
+
+function addShotFiles(files) {
+  const list = Array.from(files || []).filter(f => /\.(png|jpe?g)$/i.test(f.name));
+  if (list.length === 0) return;
+  let pending = list.length;
+  list.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        shots.push({ img, name: file.name, width: img.width, height: img.height });
+        if (--pending === 0) { renderShotList(); }
+        else renderShotList();
+      };
+      img.onerror = () => { if (--pending === 0) renderShotList(); };
+      img.src = e.target.result;
+    };
+    reader.onerror = () => { if (--pending === 0) renderShotList(); };
+    reader.readAsDataURL(file);
+  });
+}
+
+function removeShot(index) {
+  shots.splice(index, 1);
+  renderShotList();
+}
+
+function clearShots() {
+  shots = [];
+  renderShotList();
+}
+
+function renderShotList() {
+  const el = document.getElementById('shotList');
+  el.innerHTML = '';
+  if (shots.length === 0) {
+    el.innerHTML = '<div class="shot-empty">Nothing loaded yet.</div>';
+  } else {
+    shots.forEach((s, i) => {
+      const row = document.createElement('div');
+      row.className = 'shot-row';
+
+      const thumb = document.createElement('img');
+      thumb.className = 'shot-thumb';
+      thumb.src = s.img.src;
+
+      const meta = document.createElement('div');
+      meta.className = 'shot-meta';
+      const name = document.createElement('div');
+      name.className = 'shot-name';
+      name.textContent = s.name;
+      const dims = document.createElement('div');
+      dims.className = 'shot-dims';
+      // Warn when padding cannot fit it, because then it gets shrunk.
+      const tooBig = s.width > shotSize.w || s.height > shotSize.h;
+      dims.textContent = s.width + ' × ' + s.height +
+        (tooBig ? '  → shrunk to fit' : '  → padded');
+      if (tooBig) dims.classList.add('shot-warn');
+      meta.appendChild(name);
+      meta.appendChild(dims);
+
+      const x = document.createElement('button');
+      x.className = 'shot-x';
+      x.textContent = '✕';
+      x.title = 'Remove';
+      x.onclick = () => removeShot(i);
+
+      row.appendChild(thumb);
+      row.appendChild(meta);
+      row.appendChild(x);
+      el.appendChild(row);
+    });
+  }
+  updateShotSummary();
+}
+
+function updateShotSummary() {
+  const bar = document.getElementById('shotSummary');
+  const btn = document.getElementById('shotGenerateBtn');
+  btn.disabled = shots.length === 0;
+  if (shots.length === 0) {
+    bar.textContent = 'No screenshots loaded.';
+    return;
+  }
+  const shrunk = shots.filter(s => s.width > shotSize.w || s.height > shotSize.h).length;
+  bar.innerHTML =
+    '<strong style="color:var(--text)">' + shots.length + '</strong> screenshot' +
+    (shots.length === 1 ? '' : 's') + ' → ' + shotSize.w + ' × ' + shotSize.h +
+    '<br>Background ' + shotColor +
+    (shrunk > 0 ? '<br><span style="color:var(--accent2)">' + shrunk + ' larger than the canvas, so shrunk to fit.</span>' : '');
+}
+
+// Paints one screenshot centred on the chosen canvas.
+function renderShotCanvas(shot) {
+  const W = shotSize.w, H = shotSize.h;
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = shotColor;
+  ctx.fillRect(0, 0, W, H);
+
+  const ratio = Math.min(W / shot.width, H / shot.height);
+  // Padding mode never enlarges: a window shot blown up goes soft, and the
+  // whole point of padding is to keep it pixel for pixel.
+  const scale = shotFit === 'fit' ? ratio : Math.min(1, ratio);
+  const w = Math.max(1, Math.round(shot.width * scale));
+  const h = Math.max(1, Math.round(shot.height * scale));
+
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(shot.img, Math.round((W - w) / 2), Math.round((H - h) / 2), w, h);
+  return canvas;
+}
+
+function shotOutputName(shot, index) {
+  const base = shot.name.replace(/\.[^.]+$/, '') || ('screenshot-' + (index + 1));
+  return base + '-' + shotSize.w + 'x' + shotSize.h + '.png';
+}
+
+async function generateShots() {
+  if (shots.length === 0) return;
+  const btn = document.getElementById('shotGenerateBtn');
+  btn.disabled = true;
+
+  document.getElementById('logOutput').innerHTML = '';
+  log('Resizing ' + shots.length + ' screenshot(s) to ' + shotSize.w + ' × ' + shotSize.h + '...', 'info');
+
+  const outputs = [];
+  const used = new Set();
+  for (let i = 0; i < shots.length; i++) {
+    try {
+      const canvas = renderShotCanvas(shots[i]);
+      const blob = await canvasToBlob(canvas);
+      const buf = await blob.arrayBuffer();
+      // Two files can share a name; keep every one of them.
+      let name = shotOutputName(shots[i], i);
+      if (used.has(name)) {
+        let n = 2;
+        const stem = name.replace(/\.png$/, '');
+        while (used.has(stem + '-' + n + '.png')) n++;
+        name = stem + '-' + n + '.png';
+      }
+      used.add(name);
+      outputs.push({ path: name, data: buf });
+      log('OK  ' + name, 'ok');
+    } catch (err) {
+      log('ERR ' + shots[i].name + ': ' + (err && err.message ? err.message : err), 'err');
+    }
+  }
+
+  try {
+    if (shotZip) {
+      log('Compressing ZIP...', 'info');
+      const zip = new JSZip();
+      for (const o of outputs) zip.file(o.path, o.data);
+      const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
+      const path = await window.__TAURI__.dialog.save({
+        defaultPath: 'screenshots-' + shotSize.w + 'x' + shotSize.h + '.zip',
+        filters: [{ name: 'ZIP archive', extensions: ['zip'] }]
+      });
+      if (path) {
+        const buf = await zipBlob.arrayBuffer();
+        await window.__TAURI__.core.invoke('write_file', { path, data: base64FromArrayBuffer(buf) });
+        log('Saved ZIP: ' + path, 'ok');
+      } else {
+        log('Save cancelled.', 'skip');
+      }
+    } else {
+      const base = await window.__TAURI__.dialog.save({
+        title: 'Save screenshots folder',
+        defaultPath: 'screenshots-' + shotSize.w + 'x' + shotSize.h
+      });
+      if (base) {
+        const baseClean = String(base).replace(/[\\/]+$/, '');
+        let saved = 0;
+        for (const o of outputs) {
+          await window.__TAURI__.core.invoke('write_file', { path: baseClean + '/' + o.path, data: dataToBase64(o.data) });
+          saved++;
+        }
+        log('Saved ' + saved + ' files to ' + baseClean, 'ok');
+      } else {
+        log('Save cancelled.', 'skip');
+      }
+    }
+  } catch (err) {
+    log('ERR saving: ' + (err && err.message ? err.message : err), 'err');
+  }
+
+  btn.disabled = false;
+}
+
+function initShots() {
+  buildSizeCards();
+  setShotColor('#000000');
+
+  const dz = document.getElementById('shotDrop');
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault();
+    dz.classList.remove('drag-over');
+    addShotFiles(e.dataTransfer.files);
+  });
+  dz.addEventListener('click', () => document.getElementById('shotInput').click());
+  document.getElementById('shotInput').addEventListener('change', e => {
+    addShotFiles(e.target.files);
+    e.target.value = '';
+  });
+
+  renderShotList();
 }
 
 // ─────────────────────────────────────────────
